@@ -16,9 +16,6 @@ class NetlistToGraph:
         :returns list of NetlistLines
         """
         netLines = [NetlistLine(line) for line in self.cct.netlist().splitlines()]
-        # todo remove print
-        print("_cleanUpNetlist:")
-        print(self.cct.netlist())
         print("------------------------")
         cleandUpNetlist = []
         for line in netLines:
@@ -43,12 +40,6 @@ class NetlistToGraph:
                 if str(line.endNode) in shallBeReplaced:
                     line.endNode = int(replaceNodeWith)
             cleandUpNetlist.append(line)
-
-        #todo remove print
-        for newLine in cleandUpNetlist:
-            newLine = newLine.reconstruct()
-            newLine = newLine[:newLine.find(";")]
-            print(newLine)
 
         return cleandUpNetlist
 

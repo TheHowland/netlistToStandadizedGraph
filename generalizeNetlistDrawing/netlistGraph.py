@@ -14,18 +14,9 @@ class NetlistGraph:
         self.graph: MultiDiGraph = graph
         self.subGraphs: list = []
 
-        print("------------------------")
         self.spanningWidth, self.subGraphs = self._findSpanningWidth()
-        print(f"GraphWidth: {self.spanningWidth.width}, nodes: {self.graph.nodes}")
-        print("------------------------")
         self.paths = self._findPaths()
-        for path in self.paths:
-            nodesList = list(path)
-            pathWidth, _ = self._findPathWidth(self.graph.subgraph(nodesList), nodesList[0], nodesList[-1])
-            print(f"pathWidth: {pathWidth.width}, path: {nodesList}")
-        print("------------------------")
         self.longestPath = self._findLongestPath()
-        print("------------------------")
 
     def getSubGraphs(self) -> list[MultiDiGraph]:
         subGraphs = []
