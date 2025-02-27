@@ -26,20 +26,30 @@ class NetlistGraph:
         print("------------------------")
         self.longestPath = self._findLongestPath()
         print("------------------------")
-        self._findParallelSubGraphs()
+
+    def getSubGraphs(self) -> list[MultiDiGraph]:
+        subGraphs = []
+        for pair in self.subGraphs:
+            subGraphs.append(
+                self.graph.subgraph(
+                    self._getAllNodesBetweenAB(tupleAB=pair)
+                )
+            )
+        return subGraphs
 
     def _findMaxSpanningWidth(self):
         return self._findSpanningWidth()[0]
 
-    def _findBranchWidth(self, branch: MultiDiGraph, startNode, endNode) -> MaxWidth:
-        return self._findSpanningWidth(branch, startNode, endNode)
+    def _findPathWidth(self, branch: MultiDiGraph, startNode, endNode) -> MaxWidth:
+        return NetlistGraph._findSpanningWidth(None, branch, startNode, endNode)
+        return self._findSpanningWidth(branch, startNode, endNode)[0]
 
-    def _findWidestBranch(self) -> WidestPath:
+    def _findWidestPath(self) -> WidestPath:
         maxWidth = MaxWidth(0, 0)
         index = 0
         for idx, path in iter(self.paths):
             nodesList = list(path)
-            width = self._findBranchWidth(self.graph.subgraph(nodesList), nodesList[0], nodesList[-1])
+            width = self._findPathWidth(self.graph.subgraph(nodesList), nodesList[0], nodesList[-1])
             if width.width > maxWidth.width:
                 maxWidth = width
                 index = idx
@@ -123,9 +133,17 @@ class NetlistGraph:
 
         return foundPath or list(self.paths)[0]
 
-    def _getAllNodesBetweenAB(self, nodeA, nodeB) -> []:
+    def _getAllNodesBetweenAB(self, nodeA=None, nodeB=None, tupleAB=None) -> []:
+        if nodeA and nodeB:
+            pass
+        elif tupleAB:
+            nodeA = tupleAB[0]
+            nodeB = tupleAB[1]
+        elif not (nodeA and nodeB) and not tupleAB:
+            raise ValueError("pass in nodeA and nodeB or tupleAB")
+
         nodes = set()
-        for path in nx.all_simple_paths(self.graph):
+        for path in nx.all_simple_paths(self.graph, nodeA, nodeB):
             nodes.update(path)
         return list(nodes)
 
