@@ -96,33 +96,38 @@ class NetlistGraph:
             nodes.update(path)
         return list(nodes)
 
-    def _findParallelSubGraphs(self):
-        parallelStartNodes = []
+    def findParallelSubGraphs(self):
+        paraSubGraphs = []
         for node in self.graph.nodes:
             if self.graph.out_degree(node) > 1:
-                parallelStartNodes.append(node)
+                successors = list(self.graph.successors(node))
+                for successor in successors:
+                    paraSubGraphs.append((node, successor))
 
-        for parallelStartNode in parallelStartNodes:
-            paths: list[set] = []
-            for path in nx.all_simple_paths(self.graph, parallelStartNode, self.graphEnd):
-                paths.append(set(path))
 
-            intersect = paths[0]
-            for path in paths:
-                intersect.intersection(path)
-            possibleEndNodes = list(intersect)
-            possibleEndNodes.remove(parallelStartNode)
+        graphs = {}
+        graphCount = 1
+        newGraph = self.graph.copy()
+        for paraSubGraph in paraSubGraphs:
+            edgesNodeAorB = list(newGraph.edges(paraSubGraph[0], paraSubGraph[1]))
+            edgesAB = [edgeAB for edgeAB in edgesNodeAorB if edgeAB[0] == paraSubGraph[0] and edgeAB[1] == paraSubGraph[1]]
+            if len(edgesAB) < 2:
+                continue
+            subGraphName = "G"+str(graphCount)
+            graphs[subGraphName] = self.graph.subgraph(paraSubGraph)
+            newGraph.remove_edges_from(edgesAB)
+            newGraph.add_edge(paraSubGraph[0], paraSubGraph[1], subGraphName)
+            graphCount += 1
 
-            endNode = possibleEndNodes[0]
-            minLength = len(nx.shortest_path(self.graph, parallelStartNode, possibleEndNodes[0]))
-            for node in possibleEndNodes[1:]:
-                curNodeLength = len(nx.shortest_path(self.graph, parallelStartNode, node))
-                if curNodeLength < minLength:
-                    minLength = curNodeLength
-                    endNode = node
+        return newGraph, graphs
 
-            newSubGraph = self.graph.subgraph(self._getAllNodesBetweenAB(parallelStartNode, endNode))
-            self.subGraphs.append(NetlistGraph(newSubGraph, parallelStartNode, endNode))
+
+    def _findRowSubGraphs(self):
+        rowNode = []
+        for node in self.graph.nodes:
+            if self.graph.out_degree(node) == 1 and self.graph.in_degree(node) == 1:
+                rowNode.append(node)
+        pass
 
     @property
     def maxPathLength(self):
