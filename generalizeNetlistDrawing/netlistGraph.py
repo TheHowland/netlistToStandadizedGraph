@@ -1,12 +1,9 @@
 from typing import Union
 
-import lcapy
 import networkx as nx
 from networkx import MultiDiGraph
-from lcapy import NetlistLine
 from maxWidth import MaxWidth
 from widestPath import WidestPath
-from netlistToGraph import NetlistToGraph
 
 class NetlistGraph:
     def __init__(self, graph: MultiDiGraph, startNode, endNode):
@@ -14,6 +11,7 @@ class NetlistGraph:
         self.graphEnd: int = endNode
         self.graph: MultiDiGraph = graph
         self.subGraphs: list[NetlistGraph] = []
+        self.paths = None
 
     def _findMaxSpanningWidth(self):
         self._findSpanningWidth(self.graph, self.graphStart, self.graphEnd)
@@ -22,6 +20,9 @@ class NetlistGraph:
         return self._findSpanningWidth(branch, startNode, endNode)
 
     def _findWidestBranch(self) -> WidestPath:
+        if not self.paths:
+            self.paths = self._findPaths()
+
         maxWidth = MaxWidth(0, 0)
         index = 0
         for idx, path in iter(self.paths):
