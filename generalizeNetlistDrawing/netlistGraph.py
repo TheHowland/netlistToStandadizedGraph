@@ -1,3 +1,5 @@
+from typing import Union
+
 import lcapy
 import networkx as nx
 from networkx import MultiDiGraph
@@ -146,12 +148,59 @@ class NetlistGraph:
 
         return childGraphs
 
-    def _findRowSubGraphs(self):
-        rowNode = []
+    def _successorPredecessorOfNodeInSet(self, node, nodeSet):
+        rowNodeSequences = []
+        successor = list(self.graph.successors(node))
+        successor = successor[0] if len(successor) == 1 else None
+        predecessors = list(self.graph.predecessors(node))
+        predecessors = predecessors[0] if len(predecessors) == 1 else None
+
+        if successor in nodeSet:
+            rowNodeSequences.append(successor)
+            nodeSet.remove(successor)
+            rowNodeSequences.extend(self._successorPredecessorOfNodeInSet(successor, nodeSet))
+        if predecessors in nodeSet:
+            rowNodeSequences.append(predecessors)
+            nodeSet.remove(predecessors)
+            rowNodeSequences.extend(self._successorPredecessorOfNodeInSet(predecessors, nodeSet))
+
+        return rowNodeSequences
+
+    def findRowSubGraphs(self, idGenerator):
+        rowNodes = set()
         for node in self.graph.nodes:
             if self.graph.out_degree(node) == 1 and self.graph.in_degree(node) == 1:
-                rowNode.append(node)
-        pass
+                rowNodes.add(node)
+
+        rowNodeSequences = []
+        while rowNodes:
+            node = rowNodes.pop()
+            rowNodeSequence = [node]
+            rowNodeSequence.extend(self._successorPredecessorOfNodeInSet(node, rowNodes))
+            rowNodeSequences.append(rowNodeSequence)
+
+        childGraphs = {}
+        for sequence in rowNodeSequences:
+            edgesAB = []
+            for elm in sequence:
+                edgesAB.extend(self.graph.in_edges(elm))
+                edgesAB.extend(self.graph.out_edges(elm))
+            subGraphName = idGenerator()
+
+            nodeAB = []
+            for elm in sequence:
+                pre = list(self.graph.predecessors(elm))[0]
+                suc = list(self.graph.successors(elm))[0]
+                if pre not in sequence:
+                    nodeAB.append(pre)
+                if suc not in sequence:
+                    nodeAB.append(suc)
+
+            if not nx.has_path(self.graph, nodeAB[0], nodeAB[1]):
+                nodeAB = (nodeAB[1], nodeAB[0])
+            nodeAB = (nodeAB[0], nodeAB[1])
+
+            childGraphs[subGraphName] = self._replaceWithSubgraph(subGraphName ,edgesAB, nodeAB)
 
     @property
     def maxPathLength(self):
@@ -165,5 +214,9 @@ class NetlistGraph:
         nx.draw_networkx_nodes(self.graph, pos)
         nx.draw_networkx_edges(self.graph, pos)
         nx.draw_networkx_labels(self.graph, pos)
+
+        # Add edge labels with keys
+        edge_labels = {(u, v): k for u, v, k in self.graph.edges(keys=True)}
+        nx.draw_networkx_edge_labels(self.graph, pos, edge_labels=edge_labels)
 
         plt.show()
