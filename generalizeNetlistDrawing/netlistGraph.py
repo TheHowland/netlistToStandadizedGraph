@@ -13,20 +13,6 @@ class NetlistGraph:
         self.graph: MultiDiGraph = graph
         self.subGraphs: list[NetlistGraph] = []
 
-        print("------------------------")
-        self.spanningWidth = self._findSpanningWidth(self.graph, self.graphStart, self.graphEnd)
-        print(f"GraphWidth: {self.spanningWidth.width}, nodes: {self.graph.nodes}")
-        print("------------------------")
-        self.paths = self._findPaths()
-        for path in self.paths:
-            nodesList = list(path)
-            branchWidth = self._findBranchWidth(self.graph.subgraph(nodesList), nodesList[0], nodesList[-1])
-            print(f"branchWidth: {branchWidth.width}, path: {nodesList}")
-        print("------------------------")
-        self.longestPath = self._findLongestPath()
-        print("------------------------")
-        self._findParallelSubGraphs()
-
     def _findMaxSpanningWidth(self):
         self._findSpanningWidth(self.graph, self.graphStart, self.graphEnd)
 
@@ -106,7 +92,7 @@ class NetlistGraph:
 
     def _getAllNodesBetweenAB(self, nodeA, nodeB) -> []:
         nodes = set()
-        for path in nx.all_simple_paths(self.graph):
+        for path in nx.all_simple_paths(self.graph, nodeA, nodeB):
             nodes.update(path)
         return list(nodes)
 
