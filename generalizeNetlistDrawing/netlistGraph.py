@@ -96,31 +96,55 @@ class NetlistGraph:
             nodes.update(path)
         return list(nodes)
 
-    def findParallelSubGraphs(self):
+    def _edgesBetweenNodes(self, nodeA=None, nodeB=None, nodeAB=None) -> Union[list, None]:
+        if nodeA and nodeB:
+            a = nodeA
+            b = nodeB
+        elif nodeAB:
+            a = nodeAB[0]
+            b = nodeAB[1]
+        else:
+            raise ValueError("pass in nodeA and nodeB or nodeAB")
+
+        edgesNodeAorB = list(self.graph.edges(a, b))
+        edgesAB = [edgeAB for edgeAB in edgesNodeAorB if edgeAB[0] == a and edgeAB[1] == b]
+
+        if len(edgesAB) >= 2:
+            return edgesAB
+        else:
+            return None
+
+    def _parallelSubGraphNodes(self) -> list:
         paraSubGraphs = []
         for node in self.graph.nodes:
             if self.graph.out_degree(node) > 1:
                 successors = list(self.graph.successors(node))
                 for successor in successors:
                     paraSubGraphs.append((node, successor))
+        return paraSubGraphs
 
+    def _replaceWithSubgraph(self, subGraphName, edgesAB, nodePair: tuple):
+        subGraph = self.graph.subgraph(nodePair)
+        self.graph.remove_edges_from(edgesAB)
+        self.graph.add_edge(nodePair[0], nodePair[1], subGraphName)
 
-        graphs = {}
-        graphCount = 1
-        newGraph = self.graph.copy()
-        for paraSubGraph in paraSubGraphs:
-            edgesNodeAorB = list(newGraph.edges(paraSubGraph[0], paraSubGraph[1]))
-            edgesAB = [edgeAB for edgeAB in edgesNodeAorB if edgeAB[0] == paraSubGraph[0] and edgeAB[1] == paraSubGraph[1]]
-            if len(edgesAB) < 2:
+        return NetlistGraph(subGraph, nodePair[0], nodePair[1])
+
+    def findParallelSubGraphs(self, idGenerator):
+
+        paraSubGraphsNodePairs = self._parallelSubGraphNodes()
+
+        childGraphs = {}
+
+        for paraSubGraphNodePair in paraSubGraphsNodePairs:
+            edgesAB = self._edgesBetweenNodes(nodeAB=paraSubGraphNodePair)
+            if not edgesAB:
                 continue
-            subGraphName = "G"+str(graphCount)
-            graphs[subGraphName] = self.graph.subgraph(paraSubGraph)
-            newGraph.remove_edges_from(edgesAB)
-            newGraph.add_edge(paraSubGraph[0], paraSubGraph[1], subGraphName)
-            graphCount += 1
+            subGraphName = idGenerator()
+            childGraphs[subGraphName] = self._replaceWithSubgraph(subGraphName, edgesAB, paraSubGraphNodePair)
 
-        return newGraph, graphs
 
+        return childGraphs
 
     def _findRowSubGraphs(self):
         rowNode = []
