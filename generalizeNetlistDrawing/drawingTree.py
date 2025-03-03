@@ -19,7 +19,8 @@ class DrawingTree:
         self.graph = NetlistGraph(graph.MultiDiGraph(), graph.startNode, graph.endNode)
         self.childGraphs: dict[str, NetlistGraph] = {}
         self.createSubstitutions()
-        self.makeTree()
+        self.dependencyTree = self._makeMakeDependencyTree()
+
         print("finished init DrawingTree")
 
     def makeParaSubGraphs(self) -> bool:
@@ -48,9 +49,8 @@ class DrawingTree:
             changed = True
         return changed
 
-    def makeTree(self):
+    def _makeMakeDependencyTree(self) -> MultiDiGraph:
         tree = MultiDiGraph()
-        firstTreeElm = list(self.graph.graph.edges(keys=True))[0][2]
         keys = list(self.childGraphs.keys())
         keys.reverse()
         for key in keys:
@@ -60,21 +60,19 @@ class DrawingTree:
             for node in dependsOn:
                 tree.add_edge(key, node)
 
+        return tree
+
+    def draw_dependencyTree(self):
         import matplotlib.pyplot as plt
         import networkx as nx
 
         # Visualize the graph
-        pos = nx.spring_layout(tree)
-        nx.draw_networkx_nodes(tree, pos)
-        nx.draw_networkx_edges(tree, pos)
-        nx.draw_networkx_labels(tree, pos)
+        pos = nx.spring_layout(self.dependencyTree)
+        nx.draw_networkx_nodes(self.dependencyTree, pos)
+        nx.draw_networkx_edges(self.dependencyTree, pos)
+        nx.draw_networkx_labels(self.dependencyTree, pos)
 
         plt.show()
-
-        return tree
-
-
-
 
     def createSubstitutions(self):
         graph = self.graph
@@ -82,8 +80,6 @@ class DrawingTree:
         while changed:
             changed = self.makeParaSubGraphs()
             changed = changed or self.makeRowSubGraphs()
-
-        return graph
 
     def _newID(self):
         return "G" + str(self._idGen.newId)
