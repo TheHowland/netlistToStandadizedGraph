@@ -16,6 +16,8 @@ R6 8 12; down
 R7 10 13; down
 R8 13 15; down
 W 13 14; right
+W 10 40; right
+R10 40 14; down
 R9 14 30; down
 W 30 15; left
 W 15 31; left

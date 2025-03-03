@@ -1,32 +1,25 @@
-import lcapy
+from typing import Union
+
 import networkx as nx
 from networkx import MultiDiGraph
-from lcapy import NetlistLine
 from maxWidth import MaxWidth
 from widestPath import WidestPath
-from netlistToGraph import NetlistToGraph
-from typing import Union
 
 class NetlistGraph:
     def __init__(self, graph: MultiDiGraph, startNode, endNode):
         self.graphStart: int = startNode
         self.graphEnd: int = endNode
         self.graph: MultiDiGraph = graph
-        self.subGraphs: list = []
+        self.subGraphs: list[NetlistGraph] = []
+        self.paths = None
+        self.longestPath = None
 
-        self.spanningWidth, self.subGraphs = self._findSpanningWidth()
-        self.paths = self._findPaths()
-        self.longestPath = self._findLongestPath()
-
-    def getSubGraphs(self) -> list[MultiDiGraph]:
-        subGraphs = []
-        for pair in self.subGraphs:
-            subGraphs.append(
-                self.graph.subgraph(
-                    self._getAllNodesBetweenAB(tupleAB=pair)
-                )
-            )
-        return subGraphs
+    def copy(self) -> 'NetlistGraph':
+        return NetlistGraph(
+            self.graph.copy(),
+            self.graphStart,
+            self.graphEnd
+        )
 
     def _findMaxSpanningWidth(self):
         return self._findSpanningWidth()[0]
@@ -35,7 +28,10 @@ class NetlistGraph:
         return NetlistGraph._findSpanningWidth(None, branch, startNode, endNode)
         return self._findSpanningWidth(branch, startNode, endNode)[0]
 
-    def _findWidestPath(self) -> WidestPath:
+    def _findWidestBranch(self) -> WidestPath:
+        if not self.paths:
+            self.paths = self._findPaths()
+
         maxWidth = MaxWidth(0, 0)
         index = 0
         for idx, path in iter(self.paths):
@@ -138,8 +134,129 @@ class NetlistGraph:
             nodes.update(path)
         return list(nodes)
 
+    def _edgesBetweenNodes(self, nodeA=None, nodeB=None, nodeAB=None) -> Union[list, None]:
+        if nodeA and nodeB:
+            a = nodeA
+            b = nodeB
+        elif nodeAB:
+            a = nodeAB[0]
+            b = nodeAB[1]
+        else:
+            raise ValueError("pass in nodeA and nodeB or nodeAB")
+
+        edgesNodeAorB = list(self.graph.edges(a, b))
+        edgesAB = [edgeAB for edgeAB in edgesNodeAorB if edgeAB[0] == a and edgeAB[1] == b]
+
+        if len(edgesAB) >= 2:
+            return edgesAB
+        else:
+            return None
+
+    def _parallelSubGraphNodes(self) -> list:
+        paraSubGraphs = []
+        for node in self.graph.nodes:
+            if self.graph.out_degree(node) > 1:
+                successors = list(self.graph.successors(node))
+                for successor in successors:
+                    paraSubGraphs.append((node, successor))
+        return paraSubGraphs
+
+    def _replaceEdgesWithSubgraph(self, subGraphName: str, remEdgesAB: list, nodePair: tuple):
+        subGraph = self.graph.subgraph(nodePair).copy()
+        self.graph.remove_edges_from(remEdgesAB)
+        self.graph.add_edge(nodePair[0], nodePair[1], subGraphName)
+
+        return NetlistGraph(subGraph, nodePair[0], nodePair[1])
+
+    def _replaceNodesWithSubgraph(self, subGraphName: str, remNodes: list, nodePair: tuple):
+        subGraph = (self.graph.subgraph(list(nodePair) + remNodes)).copy()
+        while nodePair in subGraph.edges():
+            subGraph.remove_edge(nodePair[0], nodePair[1])
+
+        self.graph.remove_nodes_from(remNodes)
+        self.graph.add_edge(nodePair[0], nodePair[1], subGraphName)
+
+        return NetlistGraph(subGraph, nodePair[0], nodePair[1])
+
+    def findParallelSubGraphs(self, idGenerator):
+
+        paraSubGraphsNodePairs = self._parallelSubGraphNodes()
+
+        childGraphs = {}
+
+        for paraSubGraphNodePair in paraSubGraphsNodePairs:
+            edgesAB = self._edgesBetweenNodes(nodeAB=paraSubGraphNodePair)
+            if not edgesAB:
+                continue
+            subGraphName = idGenerator()
+            childGraphs[subGraphName] = self._replaceEdgesWithSubgraph(subGraphName, edgesAB, paraSubGraphNodePair)
+
+
+        return childGraphs
+
+    def _successorPredecessorOfNodeInSet(self, node, nodeSet):
+        rowNodeSequences = []
+        successor = list(self.graph.successors(node))
+        successor = successor[0] if len(successor) == 1 else None
+        predecessors = list(self.graph.predecessors(node))
+        predecessors = predecessors[0] if len(predecessors) == 1 else None
+
+        if successor in nodeSet:
+            rowNodeSequences.append(successor)
+            nodeSet.remove(successor)
+            rowNodeSequences.extend(self._successorPredecessorOfNodeInSet(successor, nodeSet))
+        if predecessors in nodeSet:
+            rowNodeSequences.append(predecessors)
+            nodeSet.remove(predecessors)
+            rowNodeSequences.extend(self._successorPredecessorOfNodeInSet(predecessors, nodeSet))
+
+        return rowNodeSequences
+
+    def findRowSubGraphs(self, idGenerator):
+        rowNodes = set()
+        for node in self.graph.nodes:
+            if self.graph.out_degree(node) == 1 and self.graph.in_degree(node) == 1:
+                rowNodes.add(node)
+
+        rowNodeSequences = []
+        while rowNodes:
+            node = rowNodes.pop()
+            rowNodeSequence = [node]
+            rowNodeSequence.extend(self._successorPredecessorOfNodeInSet(node, rowNodes))
+            rowNodeSequences.append(rowNodeSequence)
+
+        childGraphs = {}
+        for sequence in rowNodeSequences:
+            edgesAB = []
+            for elm in sequence:
+                edgesAB.extend(self.graph.in_edges(elm))
+                edgesAB.extend(self.graph.out_edges(elm))
+
+            nodeAB = []
+            for elm in sequence:
+                pre = list(self.graph.predecessors(elm))
+                pre = pre[0] if pre else None
+                suc = list(self.graph.successors(elm))
+                suc = suc[0] if suc else None
+
+                if pre not in sequence and pre is not None:
+                    nodeAB.append(pre)
+                if suc not in sequence and suc is not None:
+                    nodeAB.append(suc)
+
+            if not nx.has_path(self.graph, nodeAB[0], nodeAB[1]):
+                nodeAB = (nodeAB[1], nodeAB[0])
+            nodeAB = (nodeAB[0], nodeAB[1])
+
+            subGraphName = idGenerator()
+            childGraphs[subGraphName] = self._replaceNodesWithSubgraph(subGraphName, sequence, nodeAB)
+
+        return childGraphs
+
     @property
     def maxPathLength(self):
+        if not self.longestPath:
+            self.longestPath = self._findLongestPath()
         return len(self.longestPath)
 
     def draw_graph(self):
@@ -150,5 +267,9 @@ class NetlistGraph:
         nx.draw_networkx_nodes(self.graph, pos)
         nx.draw_networkx_edges(self.graph, pos)
         nx.draw_networkx_labels(self.graph, pos)
+
+        # Add edge labels with keys
+        edge_labels = {(u, v): k for u, v, k in self.graph.edges(keys=True)}
+        nx.draw_networkx_edge_labels(self.graph, pos, edge_labels=edge_labels)
 
         plt.show()
