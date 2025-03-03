@@ -49,11 +49,10 @@ class DrawingTree:
 
     def createTree(self):
         graph = self.graph
-        changed1 = True
-        changed2 = True
-        while changed1 or changed2:
-            changed1 = self.makeParaSubGraphs()
-            changed2 = self.makeRowSubGraphs()
+        changed = True
+        while changed:
+            changed = self.makeParaSubGraphs()
+            changed = changed or self.makeRowSubGraphs()
 
         return graph
 
