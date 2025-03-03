@@ -12,6 +12,7 @@ class NetlistGraph:
         self.graph: MultiDiGraph = graph
         self.subGraphs: list[NetlistGraph] = []
         self.paths = None
+        self.longestPath = None
 
     def _findMaxSpanningWidth(self):
         self._findSpanningWidth(self.graph, self.graphStart, self.graphEnd)
@@ -126,9 +127,18 @@ class NetlistGraph:
                     paraSubGraphs.append((node, successor))
         return paraSubGraphs
 
-    def _replaceWithSubgraph(self, subGraphName, edgesAB, nodePair: tuple):
+    def _replaceEdgesWithSubgraph(self, subGraphName: str, remEdgesAB: list, nodePair: tuple):
         subGraph = self.graph.subgraph(nodePair)
-        self.graph.remove_edges_from(edgesAB)
+        self.graph.remove_edges_from(remEdgesAB)
+        self.graph.add_edge(nodePair[0], nodePair[1], subGraphName)
+
+        return NetlistGraph(subGraph, nodePair[0], nodePair[1])
+
+    def _replaceNodesWithSubgraph(self, subGraphName: str, remNodes: list, nodePair: tuple):
+        subGraph = (self.graph.subgraph(nodePair)).copy()
+        subGraph.add_edge(nodePair[0], nodePair[1])
+
+        self.graph.remove_nodes_from(remNodes)
         self.graph.add_edge(nodePair[0], nodePair[1], subGraphName)
 
         return NetlistGraph(subGraph, nodePair[0], nodePair[1])
@@ -144,7 +154,7 @@ class NetlistGraph:
             if not edgesAB:
                 continue
             subGraphName = idGenerator()
-            childGraphs[subGraphName] = self._replaceWithSubgraph(subGraphName, edgesAB, paraSubGraphNodePair)
+            childGraphs[subGraphName] = self._replaceEdgesWithSubgraph(subGraphName, edgesAB, paraSubGraphNodePair)
 
 
         return childGraphs
@@ -186,25 +196,32 @@ class NetlistGraph:
             for elm in sequence:
                 edgesAB.extend(self.graph.in_edges(elm))
                 edgesAB.extend(self.graph.out_edges(elm))
-            subGraphName = idGenerator()
 
             nodeAB = []
             for elm in sequence:
-                pre = list(self.graph.predecessors(elm))[0]
-                suc = list(self.graph.successors(elm))[0]
-                if pre not in sequence:
+                pre = list(self.graph.predecessors(elm))
+                pre = pre[0] if pre else None
+                suc = list(self.graph.successors(elm))
+                suc = suc[0] if suc else None
+
+                if pre not in sequence and pre is not None:
                     nodeAB.append(pre)
-                if suc not in sequence:
+                if suc not in sequence and suc is not None:
                     nodeAB.append(suc)
 
             if not nx.has_path(self.graph, nodeAB[0], nodeAB[1]):
                 nodeAB = (nodeAB[1], nodeAB[0])
             nodeAB = (nodeAB[0], nodeAB[1])
 
-            childGraphs[subGraphName] = self._replaceWithSubgraph(subGraphName ,edgesAB, nodeAB)
+            subGraphName = idGenerator()
+            childGraphs[subGraphName] = self._replaceNodesWithSubgraph(subGraphName, sequence, nodeAB)
+
+        return childGraphs
 
     @property
     def maxPathLength(self):
+        if not self.longestPath:
+            self.longestPath = self._findLongestPath()
         return len(self.longestPath)
 
     def draw_graph(self):
