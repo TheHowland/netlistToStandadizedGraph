@@ -14,6 +14,13 @@ class NetlistGraph:
         self.paths = None
         self.longestPath = None
 
+    def copy(self) -> 'NetlistGraph':
+        return NetlistGraph(
+            self.graph.copy(),
+            self.graphStart,
+            self.graphEnd
+        )
+
     def _findMaxSpanningWidth(self):
         self._findSpanningWidth(self.graph, self.graphStart, self.graphEnd)
 
@@ -128,15 +135,16 @@ class NetlistGraph:
         return paraSubGraphs
 
     def _replaceEdgesWithSubgraph(self, subGraphName: str, remEdgesAB: list, nodePair: tuple):
-        subGraph = self.graph.subgraph(nodePair)
+        subGraph = self.graph.subgraph(nodePair).copy()
         self.graph.remove_edges_from(remEdgesAB)
         self.graph.add_edge(nodePair[0], nodePair[1], subGraphName)
 
         return NetlistGraph(subGraph, nodePair[0], nodePair[1])
 
     def _replaceNodesWithSubgraph(self, subGraphName: str, remNodes: list, nodePair: tuple):
-        subGraph = (self.graph.subgraph(nodePair)).copy()
-        subGraph.add_edge(nodePair[0], nodePair[1])
+        subGraph = (self.graph.subgraph(list(nodePair) + remNodes)).copy()
+        while nodePair in subGraph.edges():
+            subGraph.remove_edge(nodePair[0], nodePair[1])
 
         self.graph.remove_nodes_from(remNodes)
         self.graph.add_edge(nodePair[0], nodePair[1], subGraphName)

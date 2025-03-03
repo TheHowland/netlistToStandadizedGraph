@@ -1,6 +1,11 @@
+from netlistGraph import NetlistGraph
+
+
 class DrawingTreeEntire:
-    def __init__(self, graph, parent: 'DrawingTreeEntire', children: dict[any, 'DrawingTreeEntire']):
-        self.parent: 'DrawingTreeEntire' = parent
+    def __init__(self, graph, children: dict[any, NetlistGraph]):
         self.graph = graph
-        self.children: dict[any, 'DrawingTreeEntire'] = children
+        self.subGraphs: dict[any, NetlistGraph] = children
         self.hasChildren = bool(list(children.values()))
+
+    def keys(self):
+        return self.subGraphs.keys()
