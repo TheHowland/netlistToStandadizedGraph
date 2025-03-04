@@ -1,81 +1,52 @@
-import networkx as nx
-
 from elementPosition import ElementPosition
-from dependencyTree import DependencyTree
 
 class PlaceElements:
-    def __init__(self, depTree: DependencyTree):
-        self.depTree = depTree
-        self.elements: dict[str, list[ElementPosition]] = {}
-        self.sizeOfSubGraph: dict[str, tuple[int, int]] = {}
-        self.startNodes = depTree.nodesWithNoSuccessor()
-        self.setSizeOfStartNodes()
-        self.createElementPositions()
-        self.placeElementsInSubGraphs()
-        self.placeElementsSubsequently()
+    def __init__(self, graph: 'NetlistGraph'):
+        """
+        This class is used to determine element positions in simple graphs where edges only
+        occur beside each other, horizontally or vertically. Two nodes with multiple edges between them or n nodes with
+        that only have one incoming and one outgoing edge except the start and end node which only have
+        an incoming or outgoing edge. It does not check if the structure it is used on is simple enough to work.
+
+        :param graph:
+        """
+        self.netGraph = graph
+        self.graph = self.netGraph.graph
+        self.elements: list[ElementPosition] = []
+        self.createElementPositionsObjects()
+        self.size = self.placeElements()
         print("finished init PlaceElements")
 
-    def placeBottom(self, subGraphName):
-        startNode = self.depTree.subGraphs[subGraphName].graphStart
-        if self.depTree.subGraphs[subGraphName].graph.out_degree(startNode) == 1:
+    def placeBottom(self):
+        startNode = self.netGraph.graphStart
+        if self.netGraph.graph.out_degree(startNode) == 1:
             return True
         else:
             return False
 
-    def placeRight(self, subGraphName):
-        startNode = self.depTree.subGraphs[subGraphName].graphStart
-        if self.depTree.subGraphs[subGraphName].graph.out_degree(startNode) >= 2:
+    def placeRight(self):
+        startNode = self.netGraph.graphStart
+        if self.graph.out_degree(startNode) >= 2:
             return True
         else:
             return False
 
-    def createElementPositions(self):
-        for node in list(self.depTree.subGraphs.keys()):
-            elements: list[ElementPosition] = []
-            for edge in list(self.depTree.subGraphs[node].graph.edges(keys=True)):
-                if edge[2][0] == "G":
-                    continue
-                else:
-                    edgeName = edge[2]
-                    elements.append(ElementPosition(name=edgeName))
+    def createElementPositionsObjects(self):
+        for edge in list(self.graph.edges(keys=True)):
+            edgeName = edge[2]
+            self.elements.append(ElementPosition(name=edgeName))
 
-            if elements:
-                self.elements[node] = elements
+    def placeElements(self) -> int:
+        if self.placeRight():
+            size = ElementPosition(1, 1)
+            offset = ElementPosition(1, 0)
+        else: #self.placeBottom
+            size = ElementPosition(1, -1)
+            offset = ElementPosition(0, -1)
 
-    def placeElementsInSubGraphs(self):
-        for key in list(self.elements.keys()):
-            if self.placeRight(key):
-                offset = ElementPosition(1, 0)
-            else:
-                offset = ElementPosition(0, -1)
+        for idx, elm in enumerate(self.elements):
+            elm += offset.scale(idx)
 
-            subNetGraph = self.depTree.subGraphs[key].graph
-            elmAndGraphs = [x[2] for x in subNetGraph.edges(keys=True)]
-            for elm in self.elements[key]:
-                elm += offset.scale(elmAndGraphs.index(elm.name))
-
-    def setSizeOfStartNodes(self):
-        for key in self.startNodes:
-            subNetGraph = self.depTree.subGraphs[key]
-            x = subNetGraph.width
-            y = subNetGraph.length - 1
-            self.sizeOfSubGraph[key] = (x, y)
-
-    def getPredecessors(self, nodes: list[any]) -> list:
-        predecessors = set()
-        for node in nodes:
-            for predecessor in list(self.depTree.depTree.predecessors(node)):
-                predecessors.add(predecessor)
-
-        return list(predecessors)
-
-    def placeElementsSubsequently(self):
-        nextNodes = self.getPredecessors(self.startNodes)
-        for node in nextNodes:
-            subNetGraph = self.depTree.subGraphs[node]
-            edges = list(subNetGraph.graph.edges(keys=True))
-            for edge in edges:
-                pass
-
+        return abs(offset + size)
 
 

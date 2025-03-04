@@ -15,11 +15,20 @@ class NetlistGraph:
         self.longestPath = None
         self.width = self._findWidestBranch().width
         self.length = self.maxPathLength
-        self.elmPlacement = PlaceElements
+        self._elmPlacement = None
 
         # todo remove if not needed
         self.subGraphs: list[NetlistGraph] = []
 
+    @property
+    def elementPlacement(self):
+        if not self._elmPlacement:
+            self._elmPlacement = PlaceElements(self)
+
+        return self._elmPlacement
+
+    def placeElements(self):
+        self._elmPlacement = PlaceElements(self)
 
     def copy(self) -> 'NetlistGraph':
         return NetlistGraph(

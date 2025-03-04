@@ -11,5 +11,4 @@ class DrawingTree:
         graph = NetlistToGraph(cct).toNetlistGraph()
         self.subStructures = FindSubStructures(graph)
         self.depTree = DependencyTree(self.subStructures.subStructures)
-        self.elementPositions = PlaceElements(self.depTree)
         pass
