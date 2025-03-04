@@ -1,7 +1,7 @@
 from lcapy import Circuit
 from lcapy.netlistLine import NetlistLine
 from networkx import MultiDiGraph
-
+from netlistGraph import NetlistGraph
 
 class NetlistToGraph:
     def __init__(self, lcapyCircuit: Circuit):
@@ -43,9 +43,13 @@ class NetlistToGraph:
 
         return cleandUpNetlist
 
-    def MultiDiGraph(self) -> MultiDiGraph:
+    def toMultiDiGraph(self) -> MultiDiGraph:
         graph = MultiDiGraph()
         for line in self.cleandUpNetlist:
             graph.add_edge(line.startNode, line.endNode, key=line.label)
 
         return graph
+
+    def toNetlistGraph(self) -> NetlistGraph:
+        graph = self.toMultiDiGraph()
+        return NetlistGraph(graph, self.startNode, self.endNode)
