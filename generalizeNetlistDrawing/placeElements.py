@@ -3,7 +3,8 @@ from dependencyTree import DependencyTree
 
 class PlaceElements:
     def __init__(self, depTree: DependencyTree):
-        self.depTree = DependencyTree
+        self.depTree = depTree
         self.elements: dict[str, ElementPosition]
-        pass
+        self.startNodes = depTree.nodesWithNoSuccessor()
+        print("finished init PlaceElements")
 

@@ -10,6 +10,7 @@ class NetlistGraph:
         self.graphStart: int = startNode
         self.graphEnd: int = endNode
         self.graph: MultiDiGraph = graph
+        # todo remove if not needed
         self.subGraphs: list[NetlistGraph] = []
         self.paths = None
         self.longestPath = None

@@ -9,8 +9,7 @@ class DependencyTree:
         self.subGraphs: dict[str, NetlistGraph] = subGraphs
         self.depTree = self._makeMakeDependencyTree()
         self.draw_dependencyTree()
-        reachable = self.reachableNodes("G7")
-        pass
+        print("finished init DependencyTree")
 
     def reachableNodes(self, node: any):
         return list(flattenList(*(nx.dfs_successors(self.depTree, node).values())))
