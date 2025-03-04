@@ -3,6 +3,7 @@ from lcapy import Circuit
 from netlistToGraph import NetlistToGraph
 from dependencyTree import DependencyTree
 from netlistGraph import NetlistGraph
+from placeElements import PlaceElements
 
 class DrawingTree:
     def __init__(self):
