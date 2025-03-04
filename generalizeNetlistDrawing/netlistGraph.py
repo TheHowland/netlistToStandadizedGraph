@@ -4,16 +4,22 @@ import networkx as nx
 from networkx import MultiDiGraph
 from maxWidth import MaxWidth
 from widestPath import WidestPath
+from placeElements import PlaceElements
 
 class NetlistGraph:
     def __init__(self, graph: MultiDiGraph, startNode, endNode):
         self.graphStart: int = startNode
         self.graphEnd: int = endNode
         self.graph: MultiDiGraph = graph
-        # todo remove if not needed
-        self.subGraphs: list[NetlistGraph] = []
         self.paths = None
         self.longestPath = None
+        self.width = self._findWidestBranch().width
+        self.length = self.maxPathLength
+        self.elmPlacement = PlaceElements
+
+        # todo remove if not needed
+        self.subGraphs: list[NetlistGraph] = []
+
 
     def copy(self) -> 'NetlistGraph':
         return NetlistGraph(
@@ -25,9 +31,9 @@ class NetlistGraph:
     def _findMaxSpanningWidth(self):
         return self._findSpanningWidth()[0]
 
-    def _findPathWidth(self, branch: MultiDiGraph, startNode, endNode) -> MaxWidth:
-        return NetlistGraph._findSpanningWidth(None, branch, startNode, endNode)
-        return self._findSpanningWidth(branch, startNode, endNode)[0]
+    @staticmethod
+    def _findPathWidth(branch: MultiDiGraph, startNode, endNode) -> MaxWidth:
+        return NetlistGraph._findSpanningWidth(branch, startNode, endNode)
 
     def _findWidestBranch(self) -> WidestPath:
         if not self.paths:
@@ -35,7 +41,7 @@ class NetlistGraph:
 
         maxWidth = MaxWidth(0, 0)
         index = 0
-        for idx, path in iter(self.paths):
+        for idx, path in enumerate(self.paths):
             nodesList = list(path)
             width = self._findPathWidth(self.graph.subgraph(nodesList), nodesList[0], nodesList[-1])
             if width.width > maxWidth.width:
@@ -43,17 +49,12 @@ class NetlistGraph:
                 index = idx
         return WidestPath(maxWidth.width, maxWidth.depth, index, self.graph)
 
-    def _findSpanningWidth(self, graph: MultiDiGraph=None, startNode=None, endNode=None) -> (MaxWidth, list[tuple]):
+    @staticmethod
+    def _findSpanningWidth(graph: MultiDiGraph, startNode, endNode) -> MaxWidth:
         """
         calculate the maximum count of concurrent branches to determine the needed raster width to draw netlist
         :return: MaxWidth object -> maxWidth and depth
         """
-        if self:
-            graph = self.graph
-            startNode = self.graphStart
-            endNode = self.graphEnd
-        if not (graph and startNode and endNode):
-            raise ValueError("pass in graph startNode and endNode or self")
 
         # there has to be one branch and
         # instead of removing the endNode increase by one, the endNode has no outgoing edges therefore its result is -1
@@ -63,19 +64,12 @@ class NetlistGraph:
 
         width = 1
         diffOutIn = 0
-
-        parallelSubGraphs = []
-        parallelSubGraphStart:Union[int, None] = None
-
         while True:
 
             for node in nodesToCheck:
                 newBranches = (graph.out_degree(node) - 1)
                 width += newBranches
                 diffOutIn += (graph.out_degree(node) - graph.in_degree(node))
-
-                if not parallelSubGraphStart and diffOutIn > 1:
-                    parallelSubGraphStart = node
 
             if width > maxWidth.width:
                 maxWidth = MaxWidth(width, depth)
@@ -84,28 +78,22 @@ class NetlistGraph:
             # has to be reset
             if diffOutIn == 1:
                 width = 1
-                if parallelSubGraphStart:
-                    # if the difference of in out is 1 all concurrent branches have to merge in this node
-                    parallelSubGraphs.append((parallelSubGraphStart, nodesToCheck[0]))
-                    parallelSubGraphStart = None
 
-
-            #determine nodes of depth + 1
+            # determine nodes of depth + 1
             nextNodesToCheck = []
             for node in nodesToCheck:
                 nextNodesToCheck.extend(list(graph.successors(node)))
-            #algorithm only works for nodes that have a successor, end node does not have a successor
+            if not nextNodesToCheck:
+                break
+
+            # algorithm only works for nodes that have a successor, end node does not have a successor
             if endNode in nextNodesToCheck:
                 nextNodesToCheck.remove(endNode)
-            if not nextNodesToCheck:
-                if parallelSubGraphStart:
-                    parallelSubGraphs.append((parallelSubGraphStart, endNode))
-                break
             nodesToCheck = nextNodesToCheck
 
             depth += 1
 
-        return maxWidth, parallelSubGraphs
+        return maxWidth
 
     def _findPaths(self) -> list[list]:
         return list(nx.all_simple_paths(self.graph, self.graphStart, self.graphEnd))
@@ -255,7 +243,7 @@ class NetlistGraph:
         return childGraphs
 
     @property
-    def maxPathLength(self):
+    def maxPathLength(self) -> int:
         if not self.longestPath:
             self.longestPath = self._findLongestPath()
         return len(self.longestPath)

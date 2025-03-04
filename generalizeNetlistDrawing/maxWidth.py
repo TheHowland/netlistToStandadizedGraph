@@ -1,5 +1,5 @@
 class MaxWidth:
-    def __init__(self, width, depth):
+    def __init__(self, width: int, depth: int):
         self._width = width
         self._depth = depth
 
@@ -10,9 +10,9 @@ class MaxWidth:
         return self.width, self.depth
 
     @property
-    def width(self):
+    def width(self) -> int:
         return self._width
 
     @property
-    def depth(self):
+    def depth(self) -> int:
         return self._depth
