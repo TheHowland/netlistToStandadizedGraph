@@ -51,3 +51,7 @@ class ElementPosition:
     def scale(self, factor: int):
         selfX, selfY = self.pos
         return ElementPosition(selfX * factor, selfY * factor)
+
+    def __abs__(self):
+        selfX, selfY = self.pos
+        return ElementPosition(abs(selfX), abs(selfY))
