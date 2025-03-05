@@ -9,7 +9,14 @@ class DependencyTree:
         self.subGraphs: dict[str, NetlistGraph] = subGraphs
         self.depTree = self._makeMakeDependencyTree()
         self.draw_dependencyTree()
+        self.startNode = self.findStartNode()
         print("finished init DependencyTree")
+
+    def findStartNode(self):
+        for node in self.depTree.nodes:
+            if self.depTree.in_degree(node) == 0:
+                return node
+        raise RuntimeError("Dependency graph seems to have a loop (no start node found), where in_degree == 0")
 
     def reachableNodes(self, node: any):
         return list(flattenList(*(dfs_successors(self.depTree, node).values())))

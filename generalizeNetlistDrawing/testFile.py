@@ -1,7 +1,7 @@
 from lcapy.validateCircuitFile import ValidateCircuitFile
 from drawingTree import DrawingTree
 
-fileName = "test2.txt"
+fileName = "test1.txt"
 if not ValidateCircuitFile([fileName]):
     exit("File not valid")
 
