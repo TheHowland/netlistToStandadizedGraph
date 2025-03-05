@@ -12,7 +12,7 @@ class PlaceElements:
         """
         self.netGraph = graph
         self.graph = self.netGraph.graph
-        self.elements: list[ElementPosition] = []
+        self.elements: dict[str, ElementPosition] = {}
         self.createElementPositionsObjects()
         self.size = self.placeElements()
         print("finished init PlaceElements")
@@ -34,9 +34,9 @@ class PlaceElements:
     def createElementPositionsObjects(self):
         for edge in list(self.graph.edges(keys=True)):
             edgeName = edge[2]
-            self.elements.append(ElementPosition(name=edgeName))
+            self.elements[edgeName] = ElementPosition(name=edgeName)
 
-    def placeElements(self) -> int:
+    def placeElements(self) -> tuple[int, int]:
         if self.placeRight():
             size = ElementPosition(1, 1)
             offset = ElementPosition(1, 0)
@@ -44,9 +44,13 @@ class PlaceElements:
             size = ElementPosition(1, -1)
             offset = ElementPosition(0, -1)
 
-        for idx, elm in enumerate(self.elements):
-            elm += offset.scale(idx)
+        for idx, key in enumerate(self.elements.keys()):
+            self.elements[key] += offset.scale(idx)
 
-        return abs(offset + size)
+        return (abs(offset + size)).pos
+
+    def moveElements(self, delta: ElementPosition):
+        for key in iter(self.elements.keys()):
+            self.elements[key].moveXY(delta)
 
 

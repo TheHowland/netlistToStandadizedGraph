@@ -15,9 +15,27 @@ class NetlistGraph:
         self.longestPath = None
         self.width = self._findWidestBranch().width
         self._elmPlacement = None
+        self._actualSize = None
 
         # todo remove if not needed
         self.subGraphs: list[NetlistGraph] = []
+
+    def getSubGraphNames(self):
+        subGraphNames = []
+        for edge in self.graph.edges(keys=True):
+            if edge[2][0] == "G":
+                subGraphNames.append(edge[2])
+        return subGraphNames
+
+    @property
+    def actualSize(self) -> tuple[int, int]:
+        if not self._actualSize:
+            raise RuntimeError("set actualSize based on substitution process, before using it")
+        return self._actualSize
+
+    @actualSize.setter
+    def actualSize(self, size: tuple[int, int]):
+        self._actualSize = size
 
     @property
     def size(self) -> tuple[int, int]:

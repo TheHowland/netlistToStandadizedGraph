@@ -4,6 +4,11 @@ class ElementPosition:
         self._xPos = x
         self._yPos = y
 
+    def moveXY(self, delta: 'ElementPosition'):
+        deltaX, deltaY = delta.pos
+        self.moveX(deltaX)
+        self.moveY(deltaY)
+
     def move(self, deltaX, deltaY):
         self.moveX(deltaX)
         self.moveY(deltaY)

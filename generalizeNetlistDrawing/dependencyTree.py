@@ -3,7 +3,7 @@ from networkx import dfs_successors
 from netlistGraph import NetlistGraph
 from itertools import chain as flattenList
 
-import networkx as nx
+
 class DependencyTree:
     def __init__(self, subGraphs: dict[str, NetlistGraph]):
         self.subGraphs: dict[str, NetlistGraph] = subGraphs
@@ -12,7 +12,7 @@ class DependencyTree:
         print("finished init DependencyTree")
 
     def reachableNodes(self, node: any):
-        return list(flattenList(*(nx.dfs_successors(self.depTree, node).values())))
+        return list(flattenList(*(dfs_successors(self.depTree, node).values())))
 
     def getPredecessors(self, nodes: list[any]) -> list:
         predecessors = set()

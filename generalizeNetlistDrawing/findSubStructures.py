@@ -1,13 +1,6 @@
-import networkx as nx
-from networkx.classes import MultiDiGraph
 from idGenerator import IDGenerator
-from typing import Union
-from lcapy import Circuit
-from netlistToGraph import NetlistToGraph
 from netlistGraph import NetlistGraph
-from drawingTreeEntrie import DrawingTreeEntire
 from iterLimiter import IterLimiter
-from networkx import MultiGraph
 
 class FindSubStructures:
     def __init__(self, graph: NetlistGraph):

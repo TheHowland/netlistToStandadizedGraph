@@ -1,9 +1,10 @@
 from lcapy.validateCircuitFile import ValidateCircuitFile
 from drawingTree import DrawingTree
 
-if not ValidateCircuitFile(["test1.txt"]):
+fileName = "test2.txt"
+if not ValidateCircuitFile([fileName]):
     exit("File not valid")
 
-a = DrawingTree()
+a = DrawingTree(fileName)
 # lcapyCir = lcapy.Circuit("..\\Circuits\\resistor\\00_Resistor_Hetznecker.txt")
 # a = NetlistGraph(lcapyCir)
