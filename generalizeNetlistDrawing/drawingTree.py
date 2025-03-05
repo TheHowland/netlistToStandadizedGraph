@@ -11,4 +11,23 @@ class DrawingTree:
         graph = NetlistToGraph(cct).toNetlistGraph()
         self.subStructures = FindSubStructures(graph)
         self.depTree = DependencyTree(self.subStructures.subStructures)
+
+        startNodes = self.depTree.nodesWithNoSuccessor()
+        for node in startNodes:
+            netGraph = self.subStructures.subStructures[node]
+            netGraph.draw_graph()
+            netGraph.placeElements()
+
+        predecessors = processedNodes.copy()
+        while predecessors:
+            node = predecessors.pop()
+            netGraph = self.subStructures.subStructures[node]
+            netGraph.draw_graph()
+            netGraph.placeElements()
+            size = netGraph.size
+
+            if not predecessors:
+                processedNodes = self.depTree.getPredecessors(processedNodes)
+                predecessors = processedNodes.copy()
+
         pass

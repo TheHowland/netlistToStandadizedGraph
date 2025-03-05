@@ -14,6 +14,14 @@ class DependencyTree:
     def reachableNodes(self, node: any):
         return list(flattenList(*(nx.dfs_successors(self.depTree, node).values())))
 
+    def getPredecessors(self, nodes: list[any]) -> list:
+        predecessors = set()
+        for node in nodes:
+            for predecessor in list(self.depTree.predecessors(node)):
+                predecessors.add(predecessor)
+
+        return list(predecessors)
+
     def _makeMakeDependencyTree(self) -> MultiDiGraph:
         tree = MultiDiGraph()
         keys = list(self.subGraphs.keys())

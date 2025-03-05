@@ -14,11 +14,14 @@ class NetlistGraph:
         self.paths = None
         self.longestPath = None
         self.width = self._findWidestBranch().width
-        self.length = self.maxPathLength
         self._elmPlacement = None
 
         # todo remove if not needed
         self.subGraphs: list[NetlistGraph] = []
+
+    @property
+    def size(self) -> tuple[int, int]:
+        return self.width, self.maxPathLength - 1
 
     @property
     def elementPlacement(self):
@@ -38,7 +41,7 @@ class NetlistGraph:
         )
 
     def _findMaxSpanningWidth(self):
-        return self._findSpanningWidth()[0]
+        return self._findSpanningWidth(self.graph, self.graphStart, self.graphEnd)
 
     @staticmethod
     def _findPathWidth(branch: MultiDiGraph, startNode, endNode) -> MaxWidth:
