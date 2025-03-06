@@ -1,3 +1,6 @@
+from math import sqrt
+
+
 class Vector2D:
     def __init__(self, x=0.0, y=0.0):
         self.x = x
@@ -33,3 +36,17 @@ class Vector2D:
 
     def __abs__(self):
         return Vector2D(abs(self.x), abs(self.y))
+
+    def normalize(self) -> 'Vector2D':
+        vecLen = sqrt(self.x**2 + self.y**2)
+        return Vector2D(self.x/vecLen, self.y/vecLen)
+
+    def normalizeSelf(self):
+        vec = self.normalize()
+        self.x = vec.x
+        self.y = vec.y
+        return self
+
+    @property
+    def asTuple(self) -> tuple:
+        return self.x, self.y

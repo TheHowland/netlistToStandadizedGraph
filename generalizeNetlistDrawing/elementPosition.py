@@ -3,6 +3,7 @@ from vector2D import Vector2D
 class ElementPosition:
     def __init__(self, x=0.0, y=0.0, name="", vec: Vector2D = None):
         self.name = name
+        self._scaling = 1
         if not vec:
             self.vector = Vector2D(x,y)
         else:
@@ -26,6 +27,10 @@ class ElementPosition:
     @property
     def pos(self):
         return self.vector.x, self.vector.y
+
+    @property
+    def endPos(self) -> Vector2D:
+        return self.vector+Vector2D(0, -1).scaleSelf(self._scaling)
 
     def __str__(self):
         if self.name != "":
@@ -51,9 +56,11 @@ class ElementPosition:
         return ElementPosition(vec=self.vector * other.vector)
 
     def scale(self, factor: float) -> 'ElementPosition':
+        self._scaling = factor
         return ElementPosition(vec=self.vector.scale(factor))
 
     def scaleSelf(self, factor: float):
+        self._scaling = factor
         self.vector.x *= factor
         self.vector.y *= factor
         return self

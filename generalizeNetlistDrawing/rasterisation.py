@@ -4,6 +4,7 @@ from findSubStructures import FindSubStructures
 from lcapy import Circuit
 
 from generalizeNetlistDrawing.elementPosition import ElementPosition
+from generalizeNetlistDrawing.linePlacement import LinePlacement
 from netlistToGraph import NetlistToGraph
 from dependencyTree import DependencyTree
 from netlistGraph import NetlistGraph
@@ -26,6 +27,7 @@ class Rasterisation:
         self.createElementsForStartNodes(startNodes, resolved)
         self.subsequentlyMoveElementsBeginningAtStartNodes(resolved, startNodes)
         self.elementPositions = self.collectElements()
+        self.linePositions = LinePlacement(graph, self.elementPositions).getLinePositions()
         pass
 
     def collectElements(self) -> dict[str, ElementPosition]:

@@ -1,17 +1,24 @@
 import schemdraw as sd
 import schemdraw.elements as elm
+
+from generalizeNetlistDrawing.linePositions import LinePosition
 from generalizeNetlistDrawing.rasterisation import Rasterisation
 from generalizeNetlistDrawing.elementPosition import ElementPosition
 
 class DrawWithSchemdraw:
     def __init__(self, fileName):
-        self.elemPositions: dict[str, ElementPosition] = Rasterisation(fileName).elementPositions
+        rasterizedNetFile = Rasterisation(fileName)
+        self.elemPositions: dict[str, ElementPosition] = rasterizedNetFile.elementPositions
+        self.linePositions: [LinePosition] = rasterizedNetFile.linePositions
+
         self.elementLength = 3
         self.transformGridSize(self.elementLength)
         d = sd.Drawing(backend='svg')
         for key in iter(self.elemPositions.keys()):
             elmPos = self.elemPositions[key]
             d.add(elm.Resistor().down().label(elmPos.name).at(elmPos.pos))
+        for line in self.linePositions:
+            d.add(elm.Line().at(line.a.asTuple).to(line.b.asTuple))
         d.draw()
         pass
 
@@ -24,4 +31,7 @@ class DrawWithSchemdraw:
         """
         for key in iter(self.elemPositions.keys()):
             self.elemPositions[key].scaleSelf(GRID_SIZE)
+
+        for line in self.linePositions:
+            line.scaleSelf(GRID_SIZE)
 
