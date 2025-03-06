@@ -1,9 +1,12 @@
 from vector2D import Vector2D
 
 class ElementPosition:
-    def __init__(self, x=0.0, y=0.0, name=""):
+    def __init__(self, x=0.0, y=0.0, name="", vec: Vector2D = None):
         self.name = name
-        self.vector = Vector2D(x,y)
+        if not vec:
+            self.vector = Vector2D(x,y)
+        else:
+            self.vector = Vector2D(vec.x, vec.y)
 
     def moveXY(self, delta: 'ElementPosition'):
         deltaX, deltaY = delta.pos
@@ -31,28 +34,24 @@ class ElementPosition:
             return str(self.vector)
 
     def __add__(self, other: 'ElementPosition'):
-        vec = self.vector + other.vector
-        return ElementPosition(vec.x, vec.y)
+        return ElementPosition(vec=self.vector + other.vector)
 
     def __iadd__(self, other: 'ElementPosition'):
         self.vector += other.vector
         return self
 
     def __sub__(self, other: 'ElementPosition'):
-        vec = self.vector - other.vector
-        return ElementPosition(vec.x, vec.y)
+        return ElementPosition(vec=self.vector - other.vector)
 
     def __isub__(self, other: 'ElementPosition'):
         self.vector -= other.vector
         return self
 
     def __mul__(self, other: 'ElementPosition'):
-        vec = self.vector * other.vector
-        return ElementPosition(vec.x, vec.y)
+        return ElementPosition(vec=self.vector * other.vector)
 
     def scale(self, factor: float) -> 'ElementPosition':
-        vec = self.vector.scale(factor)
-        return ElementPosition(vec.x, vec.y)
+        return ElementPosition(vec=self.vector.scale(factor))
 
     def scaleSelf(self, factor: float):
         self.vector.x *= factor
@@ -60,4 +59,4 @@ class ElementPosition:
         return self
 
     def __abs__(self):
-        return ElementPosition(abs(self.vector.x), abs(self.vector.y))
+        return ElementPosition(vec=abs(self.vector))
