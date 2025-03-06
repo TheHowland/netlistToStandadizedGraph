@@ -1,8 +1,9 @@
+from vector2D import Vector2D
+
 class ElementPosition:
     def __init__(self, x=0.0, y=0.0, name=""):
         self.name = name
-        self._xPos = x
-        self._yPos = y
+        self.vector = Vector2D(x,y)
 
     def moveXY(self, delta: 'ElementPosition'):
         deltaX, deltaY = delta.pos
@@ -14,54 +15,49 @@ class ElementPosition:
         self.moveY(deltaY)
 
     def moveX(self, deltaX):
-        self._xPos += deltaX
+        self.vector.x += deltaX
 
     def moveY(self, deltaY):
-        self._yPos += deltaY
+        self.vector.y += deltaY
 
     @property
     def pos(self):
-        return self._xPos, self._yPos
+        return self.vector.x, self.vector.y
 
     def __str__(self):
         if self.name != "":
-            return f"{self.name}: ({self._xPos};{self._yPos})"
+            return f"{self.name}: {str(self.vector)}"
         else:
-            return f"x:{self._xPos} y: {self._yPos}"
+            return str(self.vector)
 
     def __add__(self, other: 'ElementPosition'):
-        otherX, otherY = other.pos
-        selfX, selfY = self.pos
-        return ElementPosition(selfX + otherX, selfY + otherY)
+        vec = self.vector + other.vector
+        return ElementPosition(vec.x, vec.y)
 
     def __iadd__(self, other: 'ElementPosition'):
-        otherX, otherY = other.pos
-        self.move(otherX, otherY)
+        self.vector += other.vector
         return self
 
     def __sub__(self, other: 'ElementPosition'):
-        otherX, otherY = other.pos
-        return self.__add__(ElementPosition(-1*otherX, -1*otherY))
+        vec = self.vector - other.vector
+        return ElementPosition(vec.x, vec.y)
 
     def __isub__(self, other: 'ElementPosition'):
-        otherX, otherY = other.pos
-        self.move(-1*otherX, -1*otherY)
+        self.vector -= other.vector
         return self
 
     def __mul__(self, other: 'ElementPosition'):
-        otherX, otherY = other.pos
-        selfX, selfY = self.pos
-        return ElementPosition(selfX * otherX, selfY * otherY)
+        vec = self.vector * other.vector
+        return ElementPosition(vec.x, vec.y)
 
     def scale(self, factor: float) -> 'ElementPosition':
-        selfX, selfY = self.pos
-        return ElementPosition(selfX * factor, selfY * factor)
+        vec = self.vector.scale(factor)
+        return ElementPosition(vec.x, vec.y)
 
     def scaleSelf(self, factor: float):
-        self._xPos *= factor
-        self._yPos *= factor
+        self.vector.x *= factor
+        self.vector.y *= factor
         return self
 
     def __abs__(self):
-        selfX, selfY = self.pos
-        return ElementPosition(abs(selfX), abs(selfY))
+        return ElementPosition(abs(self.vector.x), abs(self.vector.y))
