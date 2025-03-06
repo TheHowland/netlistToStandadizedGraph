@@ -3,6 +3,11 @@ from netlistGraph import NetlistGraph
 from iterLimiter import IterLimiter
 
 class FindSubStructures:
+    """
+    Searches the graph for elements that are in row or in parallel and replaces them with a G<n> edge while saving the
+    replaced structure in self.substructures. The graph is split up in substructures that contain either elements that
+    are in parallel or in row. This information is used in the Rastarisation class to place the elements.
+    """
     def __init__(self, graph: NetlistGraph):
         self._idGen = IDGenerator()
         self.iterLim = IterLimiter(1000)

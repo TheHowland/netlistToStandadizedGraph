@@ -24,6 +24,34 @@ class PlaceElements:
         else:
             return False
 
+    @property
+    def excludeGraphs(self) -> set:
+        exclude = set()
+        for key in self.elements:
+            if key[0] == 'G':
+                exclude.add(key)
+        return exclude
+
+    def getPositions(self, exclude: set) -> dict[str, ElementPosition]:
+        """
+        :param exclude: a set of keys that shall be excluded from the returned dict and is part of the keys
+         from self.elements
+        :return: all positions, including created sub graphs
+        """
+        keys = set(self.elements.keys()) - exclude
+        elements = {}
+        for key in keys:
+            elements[key] = self.elements[key]
+
+        return elements
+
+    def getElementPositions(self) -> dict[str, ElementPosition]:
+        """
+        :return: all positions of elements that where in the original graph, and excludes the graphs needed for the
+        rasterisation process
+        """
+        return self.getPositions(self.excludeGraphs)
+
     def placeRight(self):
         startNode = self.netGraph.graphStart
         if self.graph.out_degree(startNode) >= 2:

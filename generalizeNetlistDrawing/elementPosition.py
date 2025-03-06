@@ -1,5 +1,5 @@
 class ElementPosition:
-    def __init__(self, x=0, y=0, name=""):
+    def __init__(self, x=0.0, y=0.0, name=""):
         self.name = name
         self._xPos = x
         self._yPos = y
@@ -53,9 +53,14 @@ class ElementPosition:
         selfX, selfY = self.pos
         return ElementPosition(selfX * otherX, selfY * otherY)
 
-    def scale(self, factor: int):
+    def scale(self, factor: float) -> 'ElementPosition':
         selfX, selfY = self.pos
         return ElementPosition(selfX * factor, selfY * factor)
+
+    def scaleSelf(self, factor: float):
+        self._xPos *= factor
+        self._yPos *= factor
+        return self
 
     def __abs__(self):
         selfX, selfY = self.pos

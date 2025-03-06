@@ -9,7 +9,12 @@ from dependencyTree import DependencyTree
 from netlistGraph import NetlistGraph
 from itertools import chain as flattenList
 
-class DrawingTree:
+class Rasterisation:
+    """
+    places the Elements of a Netlist (electrical circuit) on a raster. The elements are placed next to each other if
+    they are in parallel and underneath each other if they are in row. Basically this transforms the Elements from their
+    local coordinate system into a global one.
+    """
     def __init__(self, fileName):
         cct = Circuit(fileName)
         graph = NetlistToGraph(cct).toNetlistGraph()
@@ -20,8 +25,16 @@ class DrawingTree:
         startNodes = self.DepTree.nodesWithNoSuccessor()
         self.createElementsForStartNodes(startNodes, resolved)
         self.subsequentlyMoveElementsBeginningAtStartNodes(resolved, startNodes)
-
+        self.elementPositions = self.collectElements()
         pass
+
+    def collectElements(self) -> dict[str, ElementPosition]:
+        elementPositions = {}
+        for key in iter(self.SubStructure.subStructures.keys()):
+            elementPositions.update(
+                self.SubStructure.subStructures[key].elementPlacement.getElementPositions()
+            )
+        return elementPositions
 
     def subsequentlyMoveElementsBeginningAtStartNodes(self, resolved, startNodes):
         predecessors = self.DepTree.getPredecessors(startNodes)

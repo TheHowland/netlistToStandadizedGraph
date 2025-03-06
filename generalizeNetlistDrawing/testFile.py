@@ -1,10 +1,12 @@
 from lcapy.validateCircuitFile import ValidateCircuitFile
-from drawingTree import DrawingTree
+from rasterisation import Rasterisation
+from backends.schemdraw.draw import DrawWithSchemdraw
 
-fileName = "test1.txt"
+fileName = "../Circuits/resistor/00_Resistor_Hetznecker.txt"
 if not ValidateCircuitFile([fileName]):
     exit("File not valid")
 
-a = DrawingTree(fileName)
+#a = Rasterisation(fileName)
+DrawWithSchemdraw(fileName)
 # lcapyCir = lcapy.Circuit("..\\Circuits\\resistor\\00_Resistor_Hetznecker.txt")
 # a = NetlistGraph(lcapyCir)
