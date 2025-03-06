@@ -15,8 +15,6 @@ class FindSubStructures:
         self.subStructures: dict[str, NetlistGraph] = {}
         self.createSubstitutions()
 
-        print("finished init DrawingTree")
-
     def makeParaSubGraphs(self) -> bool:
         self.iterLim.reInit()
         changed = False

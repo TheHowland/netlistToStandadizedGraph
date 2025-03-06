@@ -9,7 +9,6 @@ class NetlistToGraph:
         self.startNode: int
         self.endNode: int
         self.cleandUpNetlist: list[NetlistLine] = self._cleanUpNetlist()
-        print("finished init NetlistToGraph")
 
     def _cleanUpNetlist(self) -> list[NetlistLine]:
         """

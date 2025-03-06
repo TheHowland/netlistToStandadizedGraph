@@ -17,9 +17,6 @@ class NetlistGraph:
         self._elmPlacement = None
         self._actualSize = None
 
-        # todo remove if not needed
-        self.subGraphs: list[NetlistGraph] = []
-
     def getSubGraphNames(self):
         subGraphNames = []
         for edge in self.graph.edges(keys=True):

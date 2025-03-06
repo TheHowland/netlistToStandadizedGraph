@@ -9,8 +9,19 @@ class ElementPosition:
         else:
             self.vector = Vector2D(vec.x, vec.y)
 
+    @staticmethod
+    def direction(self) -> Vector2D:
+        return Vector2D(0, -1)
+
+    @staticmethod
+    def translateDirection():
+        return 'down'
+
+    def netLine(self, node1:str, node2:str):
+        return f"{self.name} {node1} {node2}; down\n"
+
     def moveXY(self, delta: 'ElementPosition'):
-        deltaX, deltaY = delta.pos
+        deltaX, deltaY = delta.startPos.asTuple
         self.moveX(deltaX)
         self.moveY(deltaY)
 
@@ -25,8 +36,8 @@ class ElementPosition:
         self.vector.y += deltaY
 
     @property
-    def pos(self):
-        return self.vector.x, self.vector.y
+    def startPos(self) -> Vector2D:
+        return Vector2D(self.vector.x, self.vector.y)
 
     @property
     def endPos(self) -> Vector2D:

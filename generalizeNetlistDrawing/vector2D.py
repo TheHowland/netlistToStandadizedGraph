@@ -26,6 +26,9 @@ class Vector2D:
     def __mul__(self, other: 'Vector2D'):
         return Vector2D(self.x * other.x, self.y * other.y)
 
+    def __hash__(self):
+        return hash(self.__str__())
+
     def scale(self, factor: float) -> 'Vector2D':
         return Vector2D(self.x * factor, self.y * factor)
 

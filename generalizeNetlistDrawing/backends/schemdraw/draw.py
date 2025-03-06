@@ -16,7 +16,7 @@ class DrawWithSchemdraw:
         d = sd.Drawing(backend='svg')
         for key in iter(self.elemPositions.keys()):
             elmPos = self.elemPositions[key]
-            d.add(elm.Resistor().down().label(elmPos.name).at(elmPos.pos))
+            d.add(elm.Resistor().down().label(elmPos.name).at(elmPos.startPos.asTuple))
         for line in self.linePositions:
             d.add(elm.Line().at(line.a.asTuple).to(line.b.asTuple))
         d.draw()

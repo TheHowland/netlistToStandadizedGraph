@@ -10,7 +10,6 @@ class DependencyTree:
         self.depTree = self._makeMakeDependencyTree()
         self.draw_dependencyTree()
         self.startNode = self.findStartNode()
-        print("finished init DependencyTree")
 
     def findStartNode(self):
         for node in self.depTree.nodes:

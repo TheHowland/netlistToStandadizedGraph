@@ -15,7 +15,6 @@ class PlaceElements:
         self.elements: dict[str, ElementPosition] = {}
         self.createElementPositionsObjects()
         self.size = self.placeElements()
-        print("finished init PlaceElements")
 
     def placeBottom(self):
         startNode = self.netGraph.graphStart
@@ -75,7 +74,7 @@ class PlaceElements:
         for idx, key in enumerate(self.elements.keys()):
             self.elements[key] += offset.scale(idx)
 
-        return (abs(offset + size)).pos
+        return (abs(offset + size)).startPos.asTuple
 
     def moveElements(self, delta: ElementPosition):
         for key in iter(self.elements.keys()):
