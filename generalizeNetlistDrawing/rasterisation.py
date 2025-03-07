@@ -5,6 +5,8 @@ from lcapy import Circuit
 
 from generalizeNetlistDrawing.elementPosition import ElementPosition
 from generalizeNetlistDrawing.linePlacement import LinePlacement
+from generalizeNetlistDrawing.linePositions import LinePosition
+from generalizeNetlistDrawing.vector2D import Vector2D
 from netlistToGraph import NetlistToGraph
 from dependencyTree import DependencyTree
 from netlistGraph import NetlistGraph
@@ -23,12 +25,19 @@ class Rasterisation:
         self.SubStructure = FindSubStructures(graph)
         self.DepTree = DependencyTree(self.SubStructure.subStructures)
 
-        resolved = []
-        startNodes = self.DepTree.nodesWithNoSuccessor()
-        self.createElementsForStartNodes(startNodes, resolved)
-        self.subsequentlyMoveElementsBeginningAtStartNodes(resolved, startNodes)
-        self.elementPositions = self.collectElements()
-        self.linePositions = LinePlacement(graph, self.elementPositions).getLinePositions()
+        if self.DepTree.startNode:
+            resolved = []
+            startNodes = self.DepTree.nodesWithNoSuccessor()
+            self.createElementsForStartNodes(startNodes, resolved)
+            self.subsequentlyMoveElementsBeginningAtStartNodes(resolved, startNodes)
+            self.elementPositions = self.collectElements()
+            self.linePositions = LinePlacement(graph, self.elementPositions).getLinePositions()
+        else:
+            # if there is only one element left the drawing always is the same and the whole substrucutre
+            # replacement does not work because there are non...
+            elmName = list(graph.graph.edges(keys=True))[0][2]
+            self.elementPositions = {'G1': ElementPosition(name=elmName)}
+            self.linePositions = [LinePosition(Vector2D(0, -1), Vector2D(-1, -1))]
         pass
 
     def collectElements(self) -> dict[str, ElementPosition]:

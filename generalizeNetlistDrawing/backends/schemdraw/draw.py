@@ -20,12 +20,12 @@ class DrawWithSchemdraw:
         for key in iter(self.elemPositions.keys()):
             elmPos = self.elemPositions[key]
             self.d.add(elm.Resistor().down().label(elmPos.name).at(elmPos.startPos.asTuple))
-            if elmPos.vector.y < self.length:
-                self.length = elmPos.vector.y
+            if elmPos.endPos.y < self.length:
+                self.length = elmPos.endPos.y
         for line in self.linePositions:
             self.d.add(elm.Line().at(line.a.asTuple).to(line.b.asTuple))
-            if line.a.y < self.length:
-                self.length = line.a.y
+            if line.endPos.y < self.length:
+                self.length = line.endPos.y
         self.addSource()
         self.d.draw()
         pass
@@ -49,11 +49,12 @@ class DrawWithSchemdraw:
         else:
             source = elm.SourceV().up().label("V1")
         bottomLeft = Vector2D(0, self.length)
-        topRight = Vector2D(0, 0)
+        topLeft = Vector2D(0, 0)
         sourceMinus = Vector2D(-1, -1).scaleSelf(self.elementLength)
         sourcePlus = sourceMinus + Vector2D(0,1).scaleSelf(self.elementLength)
-        horizLineBottomLeft = self.d.add(elm.Line().at(bottomLeft.asTuple).left())
-        upLine = self.d.add(elm.Line().at(horizLineBottomLeft.end).to(sourceMinus.asTuple))
-        voltSource = self.d.add(source).at(sourceMinus.asTuple)
-        horizLineTopLeft = self.d.add(elm.Line().at(sourcePlus.asTuple).to(topRight.asTuple))
+        endLineBottom = Vector2D(-1*self.elementLength, self.length)
+        self.d.add(elm.Line().at(bottomLeft.asTuple).to(endLineBottom.asTuple))
+        self.d.add(elm.Line().at(endLineBottom.asTuple).to(sourceMinus.asTuple))
+        self.d.add(source).at(sourceMinus.asTuple)
+        self.d.add(elm.Line().at(sourcePlus.asTuple).to(topLeft.asTuple))
 

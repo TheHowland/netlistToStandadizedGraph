@@ -4,6 +4,6 @@ from lcapy.solution import Solution
 from lcapy.langSymbols import LangSymbols
 import os
 
-def DrawCircuit(fileContent):
+def DrawCircuit(fileContent: str):
     cct = Circuit(fileContent)
     DrawWithSchemdraw(cct, LangSymbols(), fileName="test").draw()

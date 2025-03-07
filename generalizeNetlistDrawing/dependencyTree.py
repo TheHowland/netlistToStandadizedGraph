@@ -8,7 +8,10 @@ class DependencyTree:
     def __init__(self, subGraphs: dict[str, NetlistGraph]):
         self.subGraphs: dict[str, NetlistGraph] = subGraphs
         self.depTree = self._makeMakeDependencyTree()
-        self.draw_dependencyTree()
+        if len(self.depTree.nodes) == 0:
+            self.startNode = None
+            return
+        #self.draw_dependencyTree()
         self.startNode = self.findStartNode()
 
     def findStartNode(self):

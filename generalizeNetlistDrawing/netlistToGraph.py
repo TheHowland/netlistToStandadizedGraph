@@ -16,7 +16,6 @@ class NetlistToGraph:
         :returns list of NetlistLines
         """
         netLines = [NetlistLine(line) for line in self.cct.netlist().splitlines()]
-        print("------------------------")
         cleandUpNetlist = []
         for line in netLines:
             if line.type == "W":

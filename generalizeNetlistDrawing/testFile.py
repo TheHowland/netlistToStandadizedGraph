@@ -1,13 +1,13 @@
 from lcapy.validateCircuitFile import ValidateCircuitFile
-from rasterisation import Rasterisation
 from backends.schemdraw.draw import DrawWithSchemdraw
-from backends.lcapyNetlist.export import ExportAsLcapyNetlist
 
 # fileName = "../Circuits/resistor/00_Resistor_Hetznecker.txt"
-fileName = "test1.txt"
-if not ValidateCircuitFile([fileName]):
-    exit("File not valid")
+# fileName = "test1.txt"
+# if not ValidateCircuitFile([fileName]):
+#     exit("File not valid")
 
-#a = Rasterisation(fileName)
-DrawWithSchemdraw(fileName)
-# ExportAsLcapyNetlist(fileName)
+DrawWithSchemdraw("step0.txt")
+DrawWithSchemdraw("step1.txt")
+DrawWithSchemdraw("step2.txt")
+DrawWithSchemdraw("step3.txt")
+DrawWithSchemdraw("step4.txt")
