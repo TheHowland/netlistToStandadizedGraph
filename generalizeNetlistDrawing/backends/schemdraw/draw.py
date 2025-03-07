@@ -4,22 +4,30 @@ import schemdraw.elements as elm
 from generalizeNetlistDrawing.linePositions import LinePosition
 from generalizeNetlistDrawing.rasterisation import Rasterisation
 from generalizeNetlistDrawing.elementPosition import ElementPosition
+from generalizeNetlistDrawing.vector2D import Vector2D
+
 
 class DrawWithSchemdraw:
     def __init__(self, fileName):
-        rasterizedNetFile = Rasterisation(fileName)
-        self.elemPositions: dict[str, ElementPosition] = rasterizedNetFile.elementPositions
-        self.linePositions: [LinePosition] = rasterizedNetFile.linePositions
+        self.rasterizedNetFile = Rasterisation(fileName)
+        self.elemPositions: dict[str, ElementPosition] = self.rasterizedNetFile.elementPositions
+        self.linePositions: [LinePosition] = self.rasterizedNetFile.linePositions
 
         self.elementLength = 3
         self.transformGridSize(self.elementLength)
-        d = sd.Drawing(backend='svg')
+        self.d = sd.Drawing(backend='svg')
+        self.length = 0
         for key in iter(self.elemPositions.keys()):
             elmPos = self.elemPositions[key]
-            d.add(elm.Resistor().down().label(elmPos.name).at(elmPos.startPos.asTuple))
+            self.d.add(elm.Resistor().down().label(elmPos.name).at(elmPos.startPos.asTuple))
+            if elmPos.vector.y < self.length:
+                self.length = elmPos.vector.y
         for line in self.linePositions:
-            d.add(elm.Line().at(line.a.asTuple).to(line.b.asTuple))
-        d.draw()
+            self.d.add(elm.Line().at(line.a.asTuple).to(line.b.asTuple))
+            if line.a.y < self.length:
+                self.length = line.a.y
+        self.addSource()
+        self.d.draw()
         pass
 
     def transformGridSize(self, GRID_SIZE=3):
@@ -34,4 +42,18 @@ class DrawWithSchemdraw:
 
         for line in self.linePositions:
             line.scaleSelf(GRID_SIZE)
+
+    def addSource(self):
+        if self.rasterizedNetFile.transformer.ac_dc == "dc":
+            source = elm.SourceV().up().label("V1")
+        else:
+            source = elm.SourceV().up().label("V1")
+        bottomLeft = Vector2D(0, self.length)
+        topRight = Vector2D(0, 0)
+        sourceMinus = Vector2D(-1, -1).scaleSelf(self.elementLength)
+        sourcePlus = sourceMinus + Vector2D(0,1).scaleSelf(self.elementLength)
+        horizLineBottomLeft = self.d.add(elm.Line().at(bottomLeft.asTuple).left())
+        upLine = self.d.add(elm.Line().at(horizLineBottomLeft.end).to(sourceMinus.asTuple))
+        voltSource = self.d.add(source).at(sourceMinus.asTuple)
+        horizLineTopLeft = self.d.add(elm.Line().at(sourcePlus.asTuple).to(topRight.asTuple))
 

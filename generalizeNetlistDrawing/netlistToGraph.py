@@ -24,6 +24,8 @@ class NetlistToGraph:
             if line.type == "V" or line.type == "I":
                 self.startNode = line.startNode
                 self.endNode = line.endNode
+                self.ac_dc = line.ac_dc
+                self.value = line.value
                 continue
 
             nodesToReplaceWith = self.cct.equipotential_nodes.keys()

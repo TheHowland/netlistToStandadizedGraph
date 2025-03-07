@@ -18,7 +18,8 @@ class Rasterisation:
     """
     def __init__(self, fileName):
         cct = Circuit(fileName)
-        graph = NetlistToGraph(cct).toNetlistGraph()
+        self.transformer = NetlistToGraph(cct)
+        graph = self.transformer.toNetlistGraph()
         self.SubStructure = FindSubStructures(graph)
         self.DepTree = DependencyTree(self.SubStructure.subStructures)
 
