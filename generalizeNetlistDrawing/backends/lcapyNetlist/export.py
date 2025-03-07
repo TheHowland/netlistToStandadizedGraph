@@ -1,9 +1,7 @@
 from generalizeNetlistDrawing.rasterisation import Rasterisation
 from generalizeNetlistDrawing.elementPosition import ElementPosition
 from generalizeNetlistDrawing.linePositions import LinePosition
-from generalizeNetlistDrawing.vector2D import Vector2D
 from generalizeNetlistDrawing.idGenerator import IDGenerator
-from generalizeNetlistDrawing.drawCircuit import DrawCircuit
 
 
 class ExportAsLcapyNetlist:
@@ -12,19 +10,21 @@ class ExportAsLcapyNetlist:
         self.elemPositions: dict[str, ElementPosition] = self.rasterizedNetFile.elementPositions
         self.linePositions: [LinePosition] = self.rasterizedNetFile.linePositions
         self.columns = self.sortInColumns()
+
         for column in self.columns:
             column.sort(key=lambda p:p.startPos.y, reverse=True)
         self.longestColumn = 0
-        for column in self.columns:
+        self.length = 0
+        for idx, column in enumerate(self.columns):
             if len(column) > self.longestColumn:
                 self.longestColumn = len(column)
+            if self.length > self.columns[idx][-1].endPos.y:
+                self.length = self.columns[idx][-1].endPos.y
         self.nodeIDGenerator = IDGenerator()
 
         self.nodes = self.makeNodes()
-        netlist = self.makeNetlist()
-        # find top left corner
-        # find bottom left corner
-        # add voltage source
+        self.netlist = self.makeNetlist()
+        self.addSource()
         print('Finished')
 
     def makeNodes(self) -> list[list]:
@@ -84,3 +84,26 @@ class ExportAsLcapyNetlist:
             idx += 1
 
         return columns
+
+    def addSource(self):
+        topLeft = self.nodes[0][0]
+        bottomLeft = self.nodes[0][abs(int(self.length))]
+        ac_dc = self.rasterizedNetFile.transformer.ac_dc
+        value = self.rasterizedNetFile.transformer.value
+
+        node1 = bottomLeft
+        node2 = self.nodeIDGenerator.newId
+        self.netlist += f"W {node1} {node2}; left\n"
+        for i in range(0, abs(int(self.length)) - 1):
+            node1 = node2
+            node2 = self.nodeIDGenerator.newId
+            self.netlist += f"W {node1} {node2}; up\n"
+        node1 = node2
+        node2 = self.nodeIDGenerator.newId
+        self.netlist += f"V1 {node1} {node2} {ac_dc} {value}; up\n"
+        self.netlist += f"W {node2} {topLeft}; right\n"
+
+    @property
+    def get(self):
+        return self.netlist
+
