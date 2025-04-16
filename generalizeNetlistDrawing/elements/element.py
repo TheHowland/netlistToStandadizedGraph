@@ -1,3 +1,4 @@
+from abc import abstractmethod
 from enum import Enum
 
 from generalizeNetlistDrawing.vector2D import Vector2D
@@ -10,7 +11,7 @@ class Direction(Enum):
     right = 270
 
 class Element:
-    def __init__(self, x=0.0, y=0.0, name="", vec: Vector2D = None, size: Vector2D = None, rotation=0):
+    def __init__(self, x=0.0, y=0.0, name="", vec: Vector2D = None, size: Vector2D = None, rotation=0, scaling=1.0):
         """
         :param x: x coordinate of the element
         :param y: y coordinate of the element
@@ -20,7 +21,7 @@ class Element:
         :param rotation: rotation of the element in degrees, 0 is oriented downward from (0,0) to (0,-1), rotation counterclockwise
         """
         self.name = name
-        self._scale = 1.0
+        self._scale = scaling
         self.rotation = rotation
         if not vec:
             self.vector = Vector2D(x,y)
@@ -29,7 +30,7 @@ class Element:
         self.size: Vector2D = Vector2D(1,1) if size is None else size
 
     def direction(self) -> Vector2D:
-        return (self.endPos - self.startPos).normalize()
+        return (self.startPos - self.endPos).normalize()
 
     @property
     def length(self) -> float:
@@ -118,3 +119,20 @@ class Element:
 
     def __abs__(self):
         return Element(vec=abs(self.vector))
+
+    def rotation(self) -> float:
+        angleDeg = self.direction().angle()
+        if angleDeg <= -90:
+            return -1*angleDeg - 90.0
+        if angleDeg < 0:
+            return 270 - - angleDeg # 270 + angleDeg
+
+        return angleDeg - 90.0
+
+    @abstractmethod
+    def schemdrawElement(self):
+        pass
+
+    @abstractmethod
+    def netlistLine(self):
+        pass
