@@ -112,7 +112,7 @@ class Element:
         return Element(vec=self.vector.scale(factor))
 
     def scaleSelf(self, factor: float):
-        self._scale = factor
+        self._scale *= factor
         self.vector.x *= factor
         self.vector.y *= factor
         return self
@@ -128,6 +128,19 @@ class Element:
             return 270 - - angleDeg # 270 + angleDeg
 
         return angleDeg - 90.0
+
+    def getPosWhere(self, lamdaFkt) -> Vector2D:
+        """the lambda function get self.startPos and self.endPos as arguments and checks if
+        the lambda fkt is true for (startPos, endPos) or (endPos, startPos) if true for (startPos, endPos) returns
+        startPos else returns endPos"""
+        if lamdaFkt(self.startPos, self.endPos):
+            return self.startPos
+        else:
+            return self.endPos
+
+    @property
+    def getMinY(self) -> Vector2D:
+        return self.getPosWhere(lambda a,b: a.y < b.y).y
 
     @abstractmethod
     def schemdrawElement(self):
