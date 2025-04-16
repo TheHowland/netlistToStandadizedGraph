@@ -1,7 +1,5 @@
 from networkx import MultiGraph
 
-from generalizeNetlistDrawing.interfaces.findRowNodesInterface import FindRowNodesInterface
-
 
 def findPossibleRowNodes(graph: MultiGraph) -> list:
     """
@@ -15,10 +13,10 @@ def findPossibleRowNodes(graph: MultiGraph) -> list:
     return rowNodes
 
 def findRowChainRecursive(graph: MultiGraph, node, foundNodes: set):
-    neighbors = list(graph.neighbors(node))
-    if len(neighbors) > 2:
+    if graph.degree[node] > 2:
         return []
     else:
+        neighbors = list(graph.neighbors(node))
         if not neighbors[0] in foundNodes:
             foundNodes.add(neighbors[0])
             return [neighbors[0]] + findRowChainRecursive(graph, neighbors[0], foundNodes)
@@ -28,14 +26,14 @@ def findRowChainRecursive(graph: MultiGraph, node, foundNodes: set):
         return []
 
 
-def findRowNodeChains(graph: MultiGraph) -> list:
+def findRowNodeChain(graph: MultiGraph) -> list:
     possibleRowNodes = set(findPossibleRowNodes(graph))
-    rowNodeChains = []
     while possibleRowNodes:
         node = possibleRowNodes.pop()
         foundRowNodes = set()
         neighbors = list(graph.neighbors(node))
 
+        # by defining the first two found nodes it enables to give a search direction
         foundNodes1 = {node, neighbors[0]}
         dir1 = findRowChainRecursive(graph, node, foundNodes1)
         possibleRowNodes -= foundNodes1
@@ -44,16 +42,14 @@ def findRowNodeChains(graph: MultiGraph) -> list:
         dir2 = findRowChainRecursive(graph, node, foundNodes2)
         possibleRowNodes -= foundNodes2
 
-        if foundNodes1 == foundNodes2:
-            rowNodeChains.append([node] + dir1)
+        if len(dir1) + len(dir2) + 1 > len(foundNodes1.union(foundNodes2)):
+            return [node] + dir1
         else:
             dir1.reverse()
-            rowNodeChains.append(dir1 + [node] + dir2)
+            return dir1 + [node] + dir2
+    return []
 
-
-    return rowNodeChains
-
-class FindRowNodes(FindRowNodesInterface):
+class FindRowNodes:
     def __init__(self):
         super().__init__(MultiGraph)
 
@@ -62,4 +58,4 @@ class FindRowNodes(FindRowNodesInterface):
         """
         returns the sequences of nodes that are in a row
         """
-        return findRowNodeChains(graph)
+        return findRowNodeChain(graph)

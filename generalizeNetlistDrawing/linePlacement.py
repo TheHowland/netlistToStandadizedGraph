@@ -1,10 +1,11 @@
+from element import Element
 from generalizeNetlistDrawing.vector2D import Vector2D
-from netlistGraph import NetlistGraph
-from elementPosition import ElementPosition
 from linePositions import LinePosition
+from netlistGraph import NetlistGraph
+
 
 class LinePlacement:
-    def __init__(self, netGraph: NetlistGraph, elementPositions: dict[str, ElementPosition]):
+    def __init__(self, netGraph: NetlistGraph, elementPositions: dict[str, Element]):
         self.netGraph = netGraph
         self.elementPositions = elementPositions
         self.linePositions: list[LinePosition] = []
@@ -43,7 +44,7 @@ class LinePlacement:
             if self.netGraph.graph.in_degree(node) >= 2:
                 edges = self.netGraph.graph.in_edges(node, keys=True)
                 elmNames = [edgeInfo[2] for edgeInfo in iter(edges)]
-                elmPositions: list[ElementPosition] = [self.elementPositions[elmName] for elmName in elmNames]
+                elmPositions: list[Element] = [self.elementPositions[elmName] for elmName in elmNames]
                 elmPositions.sort(key=lambda p: p.vector.x)
                 for i in range(0, len(elmPositions)-1):
                     # semantically correct would be to use the end positions but the y component, which changes
@@ -58,7 +59,7 @@ class LinePlacement:
             if self.netGraph.graph.out_degree(node) >= 2:
                 edges = self.netGraph.graph.out_edges(node, keys=True)
                 elmNames = [edgeInfo[2] for edgeInfo in iter(edges)]
-                elmPositions: list[ElementPosition] = [self.elementPositions[elmName] for elmName in elmNames]
+                elmPositions: list[Element] = [self.elementPositions[elmName] for elmName in elmNames]
                 # this has to be equal for each element because of the way they are placed
                 # and they all have to be connected otherwise they would be placed elsewhere
                 nodeDepth = elmPositions[0].vector.y

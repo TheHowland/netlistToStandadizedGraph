@@ -1,5 +1,5 @@
 from .findParallelNodes import FindParallelNodes
 from .findRowNodes import FindRowNodes
 
-findRowNodesSequences = FindRowNodes.findRowNodesSequences
-findParallelNodes = FindParallelNodes.findParallelNodes
+findRowNodesSequence = FindRowNodes.findRowNodesSequences
+findParallelNode = FindParallelNodes.findParallelNode

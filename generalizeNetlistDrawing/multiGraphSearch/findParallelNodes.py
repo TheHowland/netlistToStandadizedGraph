@@ -1,7 +1,5 @@
 from networkx import MultiGraph
 
-from generalizeNetlistDrawing.interfaces.findParallelNodesInterface import FindParallelNodesInterface
-
 
 def edgesAreParallel(edge1, edge2) -> bool:
     if edge1[0] == edge2[0] and edge1[1] == edge2[1]:
@@ -19,8 +17,7 @@ def findPotParallelNodes(graph: MultiGraph) -> list:
             paraNode.append(node)
     return paraNode
 
-def findParallelEndNode(graph: MultiGraph, node, foundNodesSet) -> list(tuple[any, any]):
-    paraNodePairs = []
+def findParallelEndNode(graph: MultiGraph, node) -> list:
     getEndNode = lambda edgeNodes, node: edgeNodes[0] if node != edgeNodes[0] else edgeNodes[1]
     edges = graph.edges(node)
     endNodes = [getEndNode(edgeNodes, node) for edgeNodes in edges]
@@ -30,25 +27,23 @@ def findParallelEndNode(graph: MultiGraph, node, foundNodesSet) -> list(tuple[an
         countDict[endNode] = countDict.get(endNode, 0) + 1
 
     for key in countDict.keys():
-        if countDict[key] > 1 and not (key in foundNodesSet and node in foundNodesSet):
-            foundNodesSet.add(node)
-            foundNodesSet.add(key)
-            paraNodePairs.append((node, key))
+        if countDict[key] > 1:
+            return [node, key]
 
-    return paraNodePairs
+    return []
 
 
-class FindParallelNodes(FindParallelNodesInterface):
+class FindParallelNodes:
     def __init__(self):
         super().__init__(MultiGraph)
 
     @staticmethod
-    def findParallelNodes(graph: MultiGraph) -> list:
-        paraNodePairs = []
-        foundNodesSet = set()
+    def findParallelNode(graph: MultiGraph) -> list:
         potParaNodes = findPotParallelNodes(graph)
 
         for node in potParaNodes:
-            paraNodePairs.extend(findParallelEndNode(graph, node, foundNodesSet))
+            paraNodePairs = findParallelEndNode(graph, node)
+            if paraNodePairs:
+                return paraNodePairs
 
-        return paraNodePairs
+        return []

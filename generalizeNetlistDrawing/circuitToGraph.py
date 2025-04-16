@@ -1,17 +1,20 @@
+from typing import Type
+
+import networkx as nx
 from lcapyInskale import Circuit
-from networkx import MultiDiGraph, MultiGraph
 from simplipfy.netlistLine import NetlistLine
 
-from netlistGraph import NetlistGraph
+from generalizeNetlistDrawing.element import Element
+from generalizeNetlistDrawing.netlistGraph import NetlistGraph
 
 
 class CircuitToGraph:
-    def __init__(self, lcapyCircuit: Circuit):
+    def __init__(self, lcapyCircuit: Circuit, graphType: Type[nx.Graph]):
         self.cct = lcapyCircuit
         self.startNode: int
         self.endNode: int
         self.cleandUpNetlist: list[NetlistLine] = self._cleanUpNetlist()
-        self.graph = None
+        self.graphType = graphType
 
     def _cleanUpNetlist(self) -> list[NetlistLine]:
         """
@@ -44,21 +47,17 @@ class CircuitToGraph:
 
         return cleandUpNetlist
 
-    def asMultiDiGraph(self) -> 'CircuitToGraph':
-        self.graph = MultiDiGraph()
+    @property
+    def Graph(self) -> nx.Graph:
+        graph = self.graphType()
         for line in self.cleandUpNetlist:
-            self.graph.add_edge(line.startNode, line.endNode, key=line.label)
+            name = line.label
+            graph.add_edge(line.startNode, line.endNode, key=name, data=Element(name=name))
+        return graph
 
-        return self
-
-    def asMultiGraph(self) -> 'CircuitToGraph':
-        self.graph = MultiGraph()
-        for line in self.cleandUpNetlist:
-            self.graph.add_edge(line.startNode, line.endNode, key=line.label)
-
-        return self
-
-    def toNetlistGraph(self) -> NetlistGraph:
-        if self.graph is None:
-            raise RuntimeError("self.graph = None, use to.. functions to convert netlist to graph first")
-        return NetlistGraph(self.graph, self.startNode, self.endNode)
+    @property
+    def NetlistGraph(self) -> NetlistGraph:
+        graph: nx.MultiGraph = self.Graph
+        if not isinstance(graph, nx.MultiGraph):
+            raise TypeError("Graph is not a MultiGraph")
+        return NetlistGraph(graph, self.startNode, self.endNode)

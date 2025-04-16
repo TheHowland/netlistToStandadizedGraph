@@ -1,4 +1,4 @@
-from math import sqrt
+from math import cos, pi, sin, sqrt
 
 
 class Vector2D:
@@ -30,7 +30,7 @@ class Vector2D:
         return hash(self.__str__())
 
     def scale(self, factor: float) -> 'Vector2D':
-        return Vector2D(self.x * factor, self.y * factor)
+        return self.__mul__(Vector2D(factor, factor))
 
     def scaleSelf(self, factor: float):
         self.x *= factor
@@ -40,8 +40,11 @@ class Vector2D:
     def __abs__(self):
         return Vector2D(abs(self.x), abs(self.y))
 
+    def length(self) -> float:
+        return sqrt(self.x**2 + self.y**2)
+
     def normalize(self) -> 'Vector2D':
-        vecLen = sqrt(self.x**2 + self.y**2)
+        vecLen = self.length()
         return Vector2D(self.x/vecLen, self.y/vecLen)
 
     def normalizeSelf(self):
@@ -49,6 +52,16 @@ class Vector2D:
         self.x = vec.x
         self.y = vec.y
         return self
+
+    def rotate(self, angleDeg=None, angleRad=None):
+        if angleDeg is not None:
+            angleRad = pi * angleDeg / 180.0
+        else:
+            angleRad = angleRad
+        # returns: RotMat2D * vec
+        newX = self.x * cos(angleRad) - self.y * sin(angleRad)
+        newY = self.x * sin(angleRad) + self.y * cos(angleRad)
+        return Vector2D(newX, newY)
 
     @property
     def asTuple(self) -> tuple:

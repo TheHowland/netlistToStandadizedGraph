@@ -1,31 +1,23 @@
 import schemdrawInskale as sd
 import schemdrawInskale.elements as elm
 
-from generalizeNetlistDrawing.linePositions import LinePosition
-from generalizeNetlistDrawing.rasterisation import Rasterisation
-from generalizeNetlistDrawing.elementPosition import ElementPosition
+from generalizeNetlistDrawing.rastarisation import Rasterisation2 as Rasterisation
 from generalizeNetlistDrawing.vector2D import Vector2D
 
 
 class DrawWithSchemdraw:
     def __init__(self, fileName):
         self.rasterizedNetFile = Rasterisation(fileName)
-        self.elemPositions: dict[str, ElementPosition] = self.rasterizedNetFile.elementPositions
-        self.linePositions: [LinePosition] = self.rasterizedNetFile.linePositions
+        self.elemPositions = self.rasterizedNetFile.netGraph.elementPositions
 
         self.elementLength = 3
         self.transformGridSize(self.elementLength)
-        self.d = sd.Drawing(backend='svg')
+        self.d = sd.Drawing(canvas='svg')
         self.length = 0
         for key in iter(self.elemPositions.keys()):
             elmPos = self.elemPositions[key]
             self.d.add(elm.Resistor().down().label(elmPos.name).at(elmPos.startPos.asTuple))
-            if elmPos.endPos.y < self.length:
-                self.length = elmPos.endPos.y
-        for line in self.linePositions:
-            self.d.add(elm.Line().at(line.a.asTuple).to(line.b.asTuple))
-            if line.endPos.y < self.length:
-                self.length = line.endPos.y
+
         self.d.draw()
         pass
 
@@ -38,9 +30,6 @@ class DrawWithSchemdraw:
         """
         for key in iter(self.elemPositions.keys()):
             self.elemPositions[key].scaleSelf(GRID_SIZE)
-
-        for line in self.linePositions:
-            line.scaleSelf(GRID_SIZE)
 
     def addSource(self):
         if self.rasterizedNetFile.transformer.ac_dc == "dc":
@@ -57,3 +46,5 @@ class DrawWithSchemdraw:
         self.d.add(source).at(sourceMinus.asTuple)
         self.d.add(elm.Line().at(sourcePlus.asTuple).to(topLeft.asTuple))
 
+if __name__ == '__main__':
+    DrawWithSchemdraw("..\\..\\test1.txt")

@@ -1,5 +1,7 @@
-from elementPosition import ElementPosition
 from networkx import all_simple_edge_paths
+
+from element import Element
+
 
 class PlaceElements:
     def __init__(self, graph: 'NetlistGraph'):
@@ -12,14 +14,14 @@ class PlaceElements:
         :param graph:
         """
         self.netGraph = graph
-        self.graph = self.netGraph.graph
-        self.elements: dict[str, ElementPosition] = {}
+        self.graph = self.netGraph.Graph
+        self.elements: dict[str, Element] = {}
         self.createElementPositionsObjects()
         self.size = self.placeElements()
 
     def placeBottom(self):
         startNode = self.netGraph.graphStart
-        if self.netGraph.graph.out_degree(startNode) == 1:
+        if self.netGraph.Graph.out_degree(startNode) == 1:
             return True
         else:
             return False
@@ -32,7 +34,7 @@ class PlaceElements:
                 exclude.add(key)
         return exclude
 
-    def getPositions(self, exclude: set) -> dict[str, ElementPosition]:
+    def getPositions(self, exclude: set) -> dict[str, Element]:
         """
         :param exclude: a set of keys that shall be excluded from the returned dict and is part of the keys
          from self.elements
@@ -45,7 +47,7 @@ class PlaceElements:
 
         return elements
 
-    def getElementPositions(self) -> dict[str, ElementPosition]:
+    def getElementPositions(self) -> dict[str, Element]:
         """
         :return: all positions of elements that where in the original graph, and excludes the graphs needed for the
         rasterisation process
@@ -63,27 +65,27 @@ class PlaceElements:
         if self.placeRight():
             for edge in list(self.graph.edges(keys=True)):
                 edgeName = edge[2]
-                self.elements[edgeName] = ElementPosition(name=edgeName)
+                self.elements[edgeName] = Element(name=edgeName)
         else:
             for edge in list(all_simple_edge_paths(self.graph, self.netGraph.graphStart, self.netGraph.graphEnd))[0]:
                 edgeName = edge[2]
-                self.elements[edgeName] = ElementPosition(name=edgeName)
+                self.elements[edgeName] = Element(name=edgeName)
 
 
     def placeElements(self) -> tuple[int, int]:
         if self.placeRight():
-            size = ElementPosition(1, 1)
-            offset = ElementPosition(1, 0)
+            size = Element(1, 1)
+            offset = Element(1, 0)
         else: #self.placeBottom
-            size = ElementPosition(1, -1)
-            offset = ElementPosition(0, -1)
+            size = Element(1, -1)
+            offset = Element(0, -1)
 
         for idx, key in enumerate(self.elements.keys()):
             self.elements[key] += offset.scale(idx)
 
         return (abs(offset + size)).startPos.asTuple
 
-    def moveElements(self, delta: ElementPosition):
+    def moveElements(self, delta: Element):
         for key in iter(self.elements.keys()):
             self.elements[key].moveXY(delta)
 

@@ -1,13 +1,13 @@
-from generalizeNetlistDrawing.rasterisation import Rasterisation
-from generalizeNetlistDrawing.elementPosition import ElementPosition
-from generalizeNetlistDrawing.linePositions import LinePosition
+from generalizeNetlistDrawing.element import Element
 from generalizeNetlistDrawing.idGenerator import IDGenerator
+from generalizeNetlistDrawing.linePositions import LinePosition
+from generalizeNetlistDrawing.rasterisation_legacy import Rasterisation
 
 
 class ExportAsLcapyNetlist:
     def __init__(self, fileName):
         self.rasterizedNetFile = Rasterisation(fileName)
-        self.elemPositions: dict[str, ElementPosition] = self.rasterizedNetFile.elementPositions
+        self.elemPositions: dict[str, Element] = self.rasterizedNetFile.elementPositions
         self.linePositions: [LinePosition] = self.rasterizedNetFile.linePositions
         self.columns = self.sortInColumns()
 

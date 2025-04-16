@@ -1,6 +1,7 @@
 from idGenerator import IDGenerator
-from netlistGraph import NetlistGraph
 from iterLimiter import IterLimiter
+from netlistGraph import NetlistGraph
+
 
 class FindSubStructures:
     """
@@ -20,7 +21,7 @@ class FindSubStructures:
         changed = False
         while True:
             newGraph = NetlistGraph(self.graph.graph.copy(), self.graph.graphStart, self.graph.graphEnd)
-            childGraphs = newGraph.findParallelSubGraphs(self._newID)
+            childGraphs = newGraph.findParallelSubGraph(self._newID)
             if not childGraphs or self.iterLim.limitReached:
                 break
             self.subStructures.update(childGraphs)
@@ -33,7 +34,7 @@ class FindSubStructures:
         changed = False
         while True:
             newGraph = NetlistGraph(self.graph.graph.copy(), self.graph.graphStart, self.graph.graphEnd)
-            childGraphs = newGraph.findRowSubGraphs(self._newID)
+            childGraphs = newGraph.findRowSubGraph(self._newID)
             if not childGraphs or self.iterLim.limitReached:
                 break
             self.subStructures.update(childGraphs)
@@ -45,7 +46,7 @@ class FindSubStructures:
         changed = True
         while changed:
             changed = self.makeParaSubGraphs()
-            changed = changed or self.makeRowSubGraphs()
+            changed = self.makeRowSubGraphs() or changed
 
     def _newID(self):
         return "G" + str(self._idGen.newId)
