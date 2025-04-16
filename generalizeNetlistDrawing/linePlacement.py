@@ -1,6 +1,7 @@
-from element import Element
+from generalizeNetlistDrawing.elements.element import Element
+from generalizeNetlistDrawing.elements.line import Line
+
 from generalizeNetlistDrawing.vector2D import Vector2D
-from linePositions import LinePosition
 from netlistGraph import NetlistGraph
 
 
@@ -8,7 +9,7 @@ class LinePlacement:
     def __init__(self, netGraph: NetlistGraph, elementPositions: dict[str, Element]):
         self.netGraph = netGraph
         self.elementPositions = elementPositions
-        self.linePositions: list[LinePosition] = []
+        self.linePositions: list[Line] = []
         self.nodeDepth: dict[str, float] = {}
         self.findVerticalLines()
         self.findHorizontalLines()
@@ -37,7 +38,7 @@ class LinePlacement:
                 for elmName in elmNames:
                     elmEndPos = self.elementPositions[elmName].endPos
                     if elmEndPos.y > yBiggest:
-                        self.linePositions.append(LinePosition(elmEndPos, Vector2D(elmEndPos.x, yBiggest)))
+                        self.linePositions.append(Line(elmEndPos, Vector2D(elmEndPos.x, yBiggest)))
 
     def findHorizontalLines(self):
         for node in iter(self.netGraph.graph.nodes):
@@ -51,7 +52,7 @@ class LinePlacement:
                     # in the end position isn't used anyway
                     elm1X = self.elementPositions[elmNames[i]].vector.x
                     elm2X = self.elementPositions[elmNames[i+1]].vector.x
-                    self.linePositions.append(LinePosition(
+                    self.linePositions.append(Line(
                         Vector2D(elm1X, self.nodeDepth[node]),
                         Vector2D(elm2X, self.nodeDepth[node])
                     ))
@@ -67,7 +68,7 @@ class LinePlacement:
                 for i in range(0, len(elmPositions)-1):
                     elm1X = self.elementPositions[elmNames[i]].vector.x
                     elm2X = self.elementPositions[elmNames[i+1]].vector.x
-                    self.linePositions.append(LinePosition(
+                    self.linePositions.append(Line(
                         Vector2D(elm1X, nodeDepth),
                         Vector2D(elm2X, nodeDepth)
                     ))

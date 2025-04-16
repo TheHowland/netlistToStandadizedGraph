@@ -4,8 +4,8 @@ from warnings import warn
 from networkx import MultiGraph, draw_networkx_edge_labels, draw_networkx_edges, draw_networkx_labels, \
     draw_networkx_nodes, spring_layout
 
-from generalizeNetlistDrawing.element import Element
-from generalizeNetlistDrawing.elementRelation import ElementRelation as rel
+from generalizeNetlistDrawing.elements.element import Element
+from generalizeNetlistDrawing.elements.elementRelation import ElementRelation as rel
 from generalizeNetlistDrawing.idGenerator import IDGenerator
 from generalizeNetlistDrawing.multiDiGraphSearch import findParallelNode, findRowNodesSequence
 from generalizeNetlistDrawing.multiDiGraphSearch.functionsOnGraph import edgesBetweenNodes

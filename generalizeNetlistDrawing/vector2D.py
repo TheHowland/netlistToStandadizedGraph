@@ -1,4 +1,4 @@
-from math import cos, pi, sin, sqrt
+from math import atan2, cos, pi, sin, sqrt
 
 
 class Vector2D:
@@ -66,3 +66,13 @@ class Vector2D:
     @property
     def asTuple(self) -> tuple:
         return self.x, self.y
+
+    def angle(self, deg=True, rad=False) -> float:
+        if deg and rad:
+            raise ValueError("Only one of deg or rad can be True")
+        angle = atan2(self.y, self.x)
+
+        if rad:
+            return angle
+        else:
+            return angle * 180 / pi
