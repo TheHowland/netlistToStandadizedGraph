@@ -11,7 +11,8 @@ class Direction(Enum):
     right = 270
 
 class Element:
-    def __init__(self, x=0.0, y=0.0, name="", vec: Vector2D = None, size: Vector2D = None, rotation=0, scaling=1.0):
+    def __init__(self, x=0.0, y=0.0, name="", vec: Vector2D = None, size: Vector2D = None, rotation=0, scaling=1.0,
+                 elmType:str = None):
         """
         :param x: x coordinate of the element
         :param y: y coordinate of the element
@@ -23,6 +24,8 @@ class Element:
         self.name = name
         self._scale = scaling
         self.rotation = rotation
+        self.elmType = elmType
+
         if not vec:
             self.vector = Vector2D(x,y)
         else:
@@ -31,6 +34,10 @@ class Element:
 
     def direction(self) -> Vector2D:
         return (self.startPos - self.endPos).normalize()
+
+    @property
+    def type(self):
+        return self.elmType
 
     @property
     def length(self) -> float:

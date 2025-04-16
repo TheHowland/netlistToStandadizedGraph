@@ -25,4 +25,4 @@ class Line(Element):
         return elm.Line().at(self.startPos.asTuple).to(self.endPos.asTuple)
 
     def netlistLine(self):
-        pass
+        raise NotImplemented("Netlist line not implemented for Line class")

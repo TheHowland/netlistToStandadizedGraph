@@ -3,9 +3,9 @@ import schemdrawInskale.elements as elm
 from generalizeNetlistDrawing.elements.element import Element
 
 
-class Resistor(Element):
-    def schemdrawElement(self) -> elm.Resistor:
-        return elm.Resistor().label(self.name).at(self.startPos.asTuple).to(self.endPos.asTuple)
+class SourceV(Element):
+    def schemdrawElement(self) -> elm.StabilizedSource:
+        return elm.StabilizedSource().label(self.name).at(self.startPos.asTuple).to(self.endPos.asTuple)
 
     def netlistLine(self):
         raise NotImplemented("Netlist line not implemented for Line class")
