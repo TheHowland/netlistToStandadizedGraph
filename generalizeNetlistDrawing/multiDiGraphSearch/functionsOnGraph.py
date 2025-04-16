@@ -2,7 +2,7 @@ from networkx import MultiDiGraph
 from networkx import all_simple_paths
 from generalizeNetlistDrawing.maxWidth import MaxWidth
 
-def edgesBetweenNodes(graph, nodeA=None, nodeB=None, nodeAB=None) -> list:
+def edgesBetweenNodes(graph: MultiDiGraph, nodeA=None, nodeB=None, nodeAB=None) -> list:
     if nodeA and nodeB:
         a = nodeA
         b = nodeB

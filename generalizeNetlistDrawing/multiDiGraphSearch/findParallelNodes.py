@@ -3,6 +3,9 @@ from generalizeNetlistDrawing.interfaces.findParallelNodesInterface import FindP
 
 
 class FindParallelNodes(FindParallelNodesInterface):
+    def __init__(self):
+        super().__init__(MultiDiGraph)
+
     @staticmethod
     def findParallelNodes(graph: MultiDiGraph) -> list:
         paraNodePairs = []

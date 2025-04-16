@@ -1,20 +1,19 @@
 import networkx as nx
-from networkx import MultiDiGraph
-from maxWidth import MaxWidth
-from widestPath import WidestPath
+from networkx import MultiGraph
+
+from multiGraphSearch import findParallelNodes, findRowNodesSequences
+from multiGraphSearch.functionsOnGraph import edgesBetweenNodes
 from placeElements import PlaceElements
 
-from multiDiGraphSearch.functionsOnGraph import edgesBetweenNodes, findSpanningWidth
-from multiDiGraphSearch import findParallelNodes, findRowNodesSequences
 
 class NetlistGraph:
-    def __init__(self, graph: MultiDiGraph, startNode, endNode):
+    def __init__(self, graph: MultiGraph, startNode, endNode):
         self.graphStart: int = startNode
         self.graphEnd: int = endNode
-        self.graph: MultiDiGraph = graph
+        self.graph: MultiGraph = graph
         self.paths = None
         self.longestPath = None
-        self.width = self._findWidestBranch().width
+        self.width = None
         self._elmPlacement = None
         self._actualSize = None
 
@@ -55,27 +54,6 @@ class NetlistGraph:
             self.graphStart,
             self.graphEnd
         )
-
-    def _findMaxSpanningWidth(self):
-        return findSpanningWidth(self.graph, self.graphStart, self.graphEnd)
-
-    @staticmethod
-    def _findPathWidth(branch: MultiDiGraph, startNode, endNode) -> MaxWidth:
-        return findSpanningWidth(branch, startNode, endNode)
-
-    def _findWidestBranch(self) -> WidestPath:
-        if not self.paths:
-            self.paths = self._findPaths()
-
-        maxWidth = MaxWidth(0, 0)
-        index = 0
-        for idx, path in enumerate(self.paths):
-            nodesList = list(path)
-            width = self._findPathWidth(self.graph.subgraph(nodesList), nodesList[0], nodesList[-1])
-            if width.width > maxWidth.width:
-                maxWidth = width
-                index = idx
-        return WidestPath(maxWidth.width, maxWidth.depth, index, self.graph)
 
     def _findPaths(self) -> list[list]:
         return list(nx.all_simple_paths(self.graph, self.graphStart, self.graphEnd))

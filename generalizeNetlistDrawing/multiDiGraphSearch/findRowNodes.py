@@ -59,6 +59,9 @@ def findSuccessorAndPredecessorOfNodeSequence(graph, sequence) -> list:
 
 
 class FindRowNodes(FindRowNodesInterface):
+    def __init__(self):
+        super().__init__(MultiDiGraph)
+
     @staticmethod
     def findRowNodesSequences(graph: MultiDiGraph) -> list:
         """

@@ -1,16 +1,16 @@
+from itertools import chain as flattenList
+
 import networkx as nx
+from lcapyInskale import Circuit
 
+from circuitToGraph import CircuitToGraph
+from dependencyTree import DependencyTree
 from findSubStructures import FindSubStructures
-from lcapy import Circuit
-
 from generalizeNetlistDrawing.elementPosition import ElementPosition
 from generalizeNetlistDrawing.linePlacement import LinePlacement
 from generalizeNetlistDrawing.linePositions import LinePosition
 from generalizeNetlistDrawing.vector2D import Vector2D
-from netlistToGraph import NetlistToGraph
-from dependencyTree import DependencyTree
-from netlistGraph import NetlistGraph
-from itertools import chain as flattenList
+
 
 class Rasterisation:
     """
@@ -20,8 +20,8 @@ class Rasterisation:
     """
     def __init__(self, fileName):
         cct = Circuit(fileName)
-        self.transformer = NetlistToGraph(cct)
-        graph = self.transformer.toNetlistGraph()
+        self.transformer = CircuitToGraph(cct)
+        graph = self.transformer.asMultiGraph().toNetlistGraph()
         self.SubStructure = FindSubStructures(graph)
         self.DepTree = DependencyTree(self.SubStructure.subStructures)
 

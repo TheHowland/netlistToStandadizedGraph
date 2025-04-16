@@ -1,4 +1,3 @@
-from lcapy.validateCircuitFile import ValidateCircuitFile
 from backends.schemdraw.draw import DrawWithSchemdraw
 
 # fileName = "../Circuits/resistor/00_Resistor_Hetznecker.txt"

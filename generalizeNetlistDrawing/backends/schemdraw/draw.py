@@ -1,5 +1,5 @@
-import schemdraw as sd
-import schemdraw.elements as elm
+import schemdrawInskale as sd
+import schemdrawInskale.elements as elm
 
 from generalizeNetlistDrawing.linePositions import LinePosition
 from generalizeNetlistDrawing.rasterisation import Rasterisation
@@ -26,7 +26,6 @@ class DrawWithSchemdraw:
             self.d.add(elm.Line().at(line.a.asTuple).to(line.b.asTuple))
             if line.endPos.y < self.length:
                 self.length = line.endPos.y
-        self.addSource()
         self.d.draw()
         pass
 

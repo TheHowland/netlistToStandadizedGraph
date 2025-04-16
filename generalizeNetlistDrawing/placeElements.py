@@ -1,4 +1,5 @@
 from elementPosition import ElementPosition
+from networkx import all_simple_edge_paths
 
 class PlaceElements:
     def __init__(self, graph: 'NetlistGraph'):
@@ -59,9 +60,15 @@ class PlaceElements:
             return False
 
     def createElementPositionsObjects(self):
-        for edge in list(self.graph.edges(keys=True)):
-            edgeName = edge[2]
-            self.elements[edgeName] = ElementPosition(name=edgeName)
+        if self.placeRight():
+            for edge in list(self.graph.edges(keys=True)):
+                edgeName = edge[2]
+                self.elements[edgeName] = ElementPosition(name=edgeName)
+        else:
+            for edge in list(all_simple_edge_paths(self.graph, self.netGraph.graphStart, self.netGraph.graphEnd))[0]:
+                edgeName = edge[2]
+                self.elements[edgeName] = ElementPosition(name=edgeName)
+
 
     def placeElements(self) -> tuple[int, int]:
         if self.placeRight():
