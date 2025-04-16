@@ -1,7 +1,7 @@
 from abc import ABC, abstractmethod
 
-class FindRowNodesInterface(ABC):
+class FindSeriesNodesInterface(ABC):
     @staticmethod
     @abstractmethod
-    def findRowNodesSequences(graph) -> list:
+    def findSeriesNodesSequence(graph) -> list:
         pass

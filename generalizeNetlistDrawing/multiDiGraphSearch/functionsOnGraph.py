@@ -1,6 +1,7 @@
-from networkx import MultiDiGraph
-from networkx import all_simple_paths
+from networkx import MultiDiGraph, all_simple_paths
+
 from generalizeNetlistDrawing.maxWidth import MaxWidth
+
 
 def edgesBetweenNodes(graph: MultiDiGraph, nodeA=None, nodeB=None, nodeAB=None) -> list:
     if nodeA and nodeB:
@@ -12,7 +13,7 @@ def edgesBetweenNodes(graph: MultiDiGraph, nodeA=None, nodeB=None, nodeAB=None) 
     else:
         raise ValueError("pass in nodeA and nodeB or nodeAB")
 
-    edgesNodeAorB = list(graph.edges(a, b))
+    edgesNodeAorB = list(graph.edges(a, keys=True)) + list(graph.edges(b, keys=True))
     edgesAB = [edgeAB for edgeAB in edgesNodeAorB if edgeAB[0] == a and edgeAB[1] == b]
 
     if len(edgesAB) >= 2:

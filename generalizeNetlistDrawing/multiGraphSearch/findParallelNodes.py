@@ -1,5 +1,7 @@
 from networkx import MultiGraph
 
+from generalizeNetlistDrawing.interfaces.findParallelNodesInterface import FindParallelNodesInterface
+
 
 def edgesAreParallel(edge1, edge2) -> bool:
     if edge1[0] == edge2[0] and edge1[1] == edge2[1]:
@@ -33,7 +35,7 @@ def findParallelEndNode(graph: MultiGraph, node) -> list:
     return []
 
 
-class FindParallelNodes:
+class FindParallelNodes(FindParallelNodesInterface):
     def __init__(self):
         super().__init__(MultiGraph)
 

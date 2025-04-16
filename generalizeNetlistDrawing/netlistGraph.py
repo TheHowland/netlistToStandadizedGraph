@@ -7,10 +7,9 @@ from networkx import MultiGraph, draw_networkx_edge_labels, draw_networkx_edges,
 from generalizeNetlistDrawing.element import Element
 from generalizeNetlistDrawing.elementRelation import ElementRelation as rel
 from generalizeNetlistDrawing.idGenerator import IDGenerator
-from generalizeNetlistDrawing.multiGraphSearch import findParallelNode, findRowNodesSequence
-from generalizeNetlistDrawing.multiGraphSearch.functionsOnGraph import edgesBetweenNodes
+from generalizeNetlistDrawing.multiDiGraphSearch import findParallelNode, findRowNodesSequence
+from generalizeNetlistDrawing.multiDiGraphSearch.functionsOnGraph import edgesBetweenNodes
 from generalizeNetlistDrawing.vector2D import Vector2D
-
 
 
 class NetlistGraph:
@@ -143,10 +142,12 @@ class NetlistGraph:
             subGraph.remove_edge(sequence[0], sequence[-1])
 
         graph = self.graph.copy()
+        #helper lambdas
+        notInbetweenNodes = lambda e,sequence: e[0] in sequence and e[1] in sequence
+        assertNotFromStartToEndOfSequence = lambda e, sequence: not (e[0] == sequence[0] and e[1] == sequence[-1])
+        filterEdges = lambda e, sequence: notInbetweenNodes(e, sequence) and assertNotFromStartToEndOfSequence(e, sequence)
 
-        # this creates one list which contains all edges of the nodes in the sequence except the first and last node
-        # those edges are already in the list by their predecessor
-        edges = [e for node in sequence[1:-1] for e in graph.edges(node, keys=True)]
+        edges = [e for node in sequence for e in graph.edges(node, keys=True) if filterEdges(e, sequence)]
         data = [graph[n1][n2][key]['data'] for n1, n2, key in edges]
         size = self.calcNewSize(relation, data)
 

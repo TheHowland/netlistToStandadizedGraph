@@ -6,5 +6,5 @@ class FindParallelNodesInterface(ABC):
 
     @staticmethod
     @abstractmethod
-    def findParallelNodes(graph) -> list:
+    def findParallelNode(graph) -> list:
         pass

@@ -1,6 +1,7 @@
 import schemdrawInskale as sd
 import schemdrawInskale.elements as elm
 
+from generalizeNetlistDrawing.linePlacement import LinePlacement
 from generalizeNetlistDrawing.rastarisation import Rasterisation2 as Rasterisation
 from generalizeNetlistDrawing.vector2D import Vector2D
 
@@ -9,14 +10,19 @@ class DrawWithSchemdraw:
     def __init__(self, fileName):
         self.rasterizedNetFile = Rasterisation(fileName)
         self.elemPositions = self.rasterizedNetFile.netGraph.elementPositions
+        self.linePositions = LinePlacement(self.rasterizedNetFile.netGraph, self.elemPositions).getLinePositions()
 
         self.elementLength = 3
         self.transformGridSize(self.elementLength)
         self.d = sd.Drawing(canvas='svg')
         self.length = 0
+        
         for key in iter(self.elemPositions.keys()):
             elmPos = self.elemPositions[key]
             self.d.add(elm.Resistor().down().label(elmPos.name).at(elmPos.startPos.asTuple))
+
+        for line in self.linePositions:
+            self.d.add(elm.Line().at(line.startPos.asTuple).to(line.endPos.asTuple))
 
         self.d.draw()
         pass
@@ -30,6 +36,9 @@ class DrawWithSchemdraw:
         """
         for key in iter(self.elemPositions.keys()):
             self.elemPositions[key].scaleSelf(GRID_SIZE)
+
+        for line in self.linePositions:
+            line.scaleSelf(GRID_SIZE)
 
     def addSource(self):
         if self.rasterizedNetFile.transformer.ac_dc == "dc":
