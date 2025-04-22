@@ -59,8 +59,8 @@ class Vector2D:
         else:
             angleRad = angleRad
         # returns: RotMat2D * vec
-        newX = self.x * cos(angleRad) - self.y * sin(angleRad)
-        newY = self.x * sin(angleRad) + self.y * cos(angleRad)
+        newX = round(self.x * cos(angleRad) - self.y * sin(angleRad), 8)
+        newY = round(self.x * sin(angleRad) + self.y * cos(angleRad), 8)
         return Vector2D(newX, newY)
 
     @property
