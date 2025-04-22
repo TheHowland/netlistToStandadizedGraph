@@ -7,8 +7,9 @@ from generalizeNetlistDrawing.vector2D import Vector2D
 class Direction(Enum):
     down = 0
     up = 180
-    left = 90
-    right = 270
+    left = 270
+    right = 90
+
 
 class Element:
     def __init__(self, x=0.0, y=0.0, name="", vec: Vector2D = None, size: Vector2D = None, rotation=0, scaling=1.0,
