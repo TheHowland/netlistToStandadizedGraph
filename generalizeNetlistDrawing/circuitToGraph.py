@@ -4,7 +4,7 @@ import networkx as nx
 from lcapyInskale import Circuit
 from simplipfy.netlistLine import NetlistLine
 
-from generalizeNetlistDrawing.elements.element import Element
+from generalizeNetlistDrawing.elements.elementFaktory import ElementFaktory
 from generalizeNetlistDrawing.netlistGraph import NetlistGraph
 
 
@@ -15,6 +15,7 @@ class CircuitToGraph:
         self.endNode: int
         self.cleandUpNetlist: list[NetlistLine] = self._cleanUpNetlist()
         self.graphType = graphType
+        self.factory = ElementFaktory().make
 
     def _cleanUpNetlist(self) -> list[NetlistLine]:
         """
@@ -52,7 +53,7 @@ class CircuitToGraph:
         graph = self.graphType()
         for line in self.cleandUpNetlist:
             name = line.label
-            graph.add_edge(line.startNode, line.endNode, key=name, data=Element(name=name))
+            graph.add_edge(line.startNode, line.endNode, key=name, data=self.factory(name=name))
         return graph
 
     @property

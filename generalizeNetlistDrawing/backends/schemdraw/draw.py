@@ -18,11 +18,10 @@ class DrawWithSchemdraw:
         self.length = 0
         
         for key in iter(self.elemPositions.keys()):
-            elmPos = self.elemPositions[key]
-            self.d.add(elm.Resistor().down().label(elmPos.name).at(elmPos.startPos.asTuple))
+            self.d.add(self.elemPositions[key].schemdrawElement())
 
         for line in self.linePositions:
-            self.d.add(elm.Line().at(line.startPos.asTuple).to(line.endPos.asTuple))
+            self.d.add(line.schemdrawElement())
 
         self.d.draw()
         pass
