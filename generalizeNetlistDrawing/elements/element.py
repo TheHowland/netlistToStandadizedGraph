@@ -46,7 +46,7 @@ class Element:
 
     def rotate(self, degree: float):
         self.vector = self.vector.rotate(degree)
-        self.rotation = degree
+        self.rotation = (self.rotation + degree) % 360
 
     def translateDirection(self):
         """

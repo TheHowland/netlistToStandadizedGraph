@@ -17,11 +17,17 @@ class DrawWithSchemdraw:
 
         drawing2 = sd.Drawing(canvas='svg')
         for elmPos in iter(self.placedElems.elements):
-            elmPos.rotate(270)
+            elmPos.rotate(90)
             drawing2.add(elmPos.schemdrawElement())
+
+        drawing3 = sd.Drawing(canvas='svg')
+        for elmPos in iter(self.placedElems.elements):
+            elmPos.rotate(90)
+            drawing3.add(elmPos.schemdrawElement())
 
         self.d.draw()
         drawing2.draw()
+        drawing3.draw()
         pass
 
     def transformGridSize(self, GRID_SIZE=3):
