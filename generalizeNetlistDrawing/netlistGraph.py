@@ -16,6 +16,7 @@ class NetlistGraph:
     idGenerator = IDGenerator()
 
     def __init__(self, graph: MultiGraph, startNode, endNode, subGraph: Union[None, MultiGraph] = None, subGraphName: str = None, relation: rel = rel.NONE):
+        # ToDo remove start and end node
         self.graphStart: int = startNode
         self.graphEnd: int = endNode
 
@@ -195,7 +196,7 @@ class NetlistGraph:
         print("Sub graph edges:" + str(self.subGraph.edges))
 
     @property
-    def elementPositions(self):
+    def elementPositions(self) -> dict:
         # Expose a dict of name: repr
         items = [self.graph[n1][n2][key]['data'] for n1, n2, key in self.graph.edges(keys=True)]
         return {item.name: item for item in items}
