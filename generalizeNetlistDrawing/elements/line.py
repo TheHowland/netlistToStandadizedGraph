@@ -8,21 +8,21 @@ class Line(Element):
     def __init__(self, vec1: Vector2D, vec2: Vector2D, name=""):
         direction = (vec1 - vec2).normalize()
         length = (vec2 - vec1).length()
-        self.b = vec2
 
         angleDeg = direction.angle()
-        if angleDeg <= -90:
-            rotation = -1 * angleDeg - 90.0
-        elif angleDeg < 0:
-            rotation = 270 - - angleDeg  # 270 + angleDeg
-        else:
-            rotation = angleDeg - 90.0
+        rotation = angleDeg - 90.0
 
         super().__init__(vec1.x, vec1.y, rotation=rotation, scaling=length)
         pass
 
+    def rotate(self, degree: float):
+        newDirection = (self.direction().angle() - 90 + degree) % 360
+
+        self.rotation = newDirection
+        self.vector = self.vector.rotate(degree)
+
     def schemdrawElement(self) -> elm.Line:
-        return elm.Line().at(self.startPos.asTuple).to(self.endPos.asTuple)
+        return elm.Line().label(self.name).at(self.startPos.asTuple).to(self.endPos.asTuple)
 
     def netlistLine(self):
         raise NotImplemented("Netlist line not implemented for Line class")

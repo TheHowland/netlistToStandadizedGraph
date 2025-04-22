@@ -72,6 +72,9 @@ class Vector2D:
             raise ValueError("Only one of deg or rad can be True")
         angle = atan2(self.y, self.x)
 
+        if angle < 0:
+            angle = pi - angle
+
         if rad:
             return angle
         else:

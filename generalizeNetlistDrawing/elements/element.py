@@ -6,9 +6,9 @@ from generalizeNetlistDrawing.vector2D import Vector2D
 
 class Direction(Enum):
     down = 0
+    right = 90
     up = 180
     left = 270
-    right = 90
 
 
 class Element:
@@ -43,6 +43,10 @@ class Element:
     @property
     def length(self) -> float:
         return self.vector.length()
+
+    def rotate(self, degree: float):
+        self.vector = self.vector.rotate(degree)
+        self.rotation = degree
 
     def translateDirection(self):
         """

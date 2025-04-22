@@ -1,20 +1,20 @@
-# from backends.schemdraw.draw import DrawWithSchemdraw
+from backends.schemdraw.draw import DrawWithSchemdraw
+DrawWithSchemdraw("test1.txt")
+
+exit(0)
+
 import schemdrawInskale as sd
 
-from generalizeNetlistDrawing.elements.element import Direction as d
-from generalizeNetlistDrawing.elements.sourceV import SourceV
+from generalizeNetlistDrawing.elements.elements import Line
+from generalizeNetlistDrawing.vector2D import Vector2D as v
 
 drawing = sd.Drawing(canvas='svg')
-down = SourceV(0, 0, "V1", rotation=d.down.value, scaling=3.0)
-left = SourceV(0, 0, "V2", rotation=d.left.value, scaling=3.0)
-up = SourceV(0, 0, "V3", rotation=d.up.value, scaling=3.0)
-right = SourceV(0, 0, "V4", rotation=d.right.value, scaling=3.0)
+line1 = Line(v(0, 0), v(3, 0))
+line2 = Line(v(3,0), v(6,0))
+line1.rotate(90)
+line2.rotate(90)
 
-drawing.add(up.schemdrawElement())
-drawing.add(left.schemdrawElement())
-drawing.add(right.schemdrawElement())
-drawing.add(down.schemdrawElement())
+drawing.add(line1.schemdrawElement())
+drawing.add(line2.schemdrawElement())
 
 drawing.draw()
-
-#DrawWithSchemdraw("test1.txt")

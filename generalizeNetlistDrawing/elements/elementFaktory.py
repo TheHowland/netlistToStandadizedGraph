@@ -1,6 +1,6 @@
 from typing import Type
 
-from generalizeNetlistDrawing.elements import capacitor, inductor, line, resistor, sourceV
+from generalizeNetlistDrawing.elements import capacitor, inductor, resistor, sourceI, sourceV
 from generalizeNetlistDrawing.elements.element import Element
 from generalizeNetlistDrawing.vector2D import Vector2D
 
@@ -12,8 +12,7 @@ class ElementFaktory:
         "C": capacitor.Capacitor,
         "Z": resistor.Resistor,
         "V": sourceV.SourceV,
-        "I": Element,
-        "W": line.Line
+        "I": sourceI.SourceI,
     }
 
     def make(self, x=0.0, y=0.0, name="", size: Vector2D = None, rotation=0, scaling=1.0, default: Element=Element) -> Element:
