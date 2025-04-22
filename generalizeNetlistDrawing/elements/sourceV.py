@@ -5,7 +5,9 @@ from generalizeNetlistDrawing.elements.element import Element
 
 class SourceV(Element):
     def schemdrawElement(self) -> elm.StabilizedSource:
-        return elm.StabilizedSource().label(self.name).at(self.endPos.asTuple).to(self.startPos.asTuple)
+        direction = self.translateDirection()
+        return elm.StabilizedSource(d=direction).label(self.name).at(self.endPos.asTuple)
+
 
     def netlistLine(self):
         raise NotImplemented("Netlist line not implemented for Line class")
