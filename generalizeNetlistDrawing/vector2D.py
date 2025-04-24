@@ -29,6 +29,9 @@ class Vector2D:
     def __hash__(self):
         return hash(self.__str__())
 
+    def __eq__(self, other):
+        return isinstance(other, Vector2D) and self.x == other.x and self.y == other.y
+
     def scale(self, factor: float) -> 'Vector2D':
         return self.__mul__(Vector2D(factor, factor))
 
@@ -54,13 +57,17 @@ class Vector2D:
         return self
 
     def rotate(self, angleDeg=None, angleRad=None):
+        """
+        Rotate the vector by a given angle in degrees or radians counter clock wise, rounds to 10 decimal digits.
+        returns: Rotation Matrix 2D * vec
+        """
         if angleDeg is not None:
             angleRad = pi * angleDeg / 180.0
         else:
             angleRad = angleRad
-        # returns: RotMat2D * vec
-        newX = round(self.x * cos(angleRad) - self.y * sin(angleRad), 8)
-        newY = round(self.x * sin(angleRad) + self.y * cos(angleRad), 8)
+        #
+        newX = round(self.x * cos(angleRad) - self.y * sin(angleRad), 10)
+        newY = round(self.x * sin(angleRad) + self.y * cos(angleRad), 10)
         return Vector2D(newX, newY)
 
     @property
@@ -79,3 +86,4 @@ class Vector2D:
             return angle
         else:
             return angle * 180 / pi
+

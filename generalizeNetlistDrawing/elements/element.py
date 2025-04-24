@@ -1,6 +1,7 @@
 from abc import abstractmethod
 from enum import Enum
 
+from generalizeNetlistDrawing.idGenerator import IDGenerator
 from generalizeNetlistDrawing.vector2D import Vector2D
 
 
@@ -34,7 +35,7 @@ class Element:
         self.size: Vector2D = Vector2D(1,1) if size is None else size
 
     def direction(self) -> Vector2D:
-        return (self.startPos - self.endPos).normalize()
+        return (self.endPos - self.startPos).normalize()
 
     @property
     def type(self):
@@ -42,21 +43,21 @@ class Element:
 
     @property
     def length(self) -> float:
-        return self.vector.length()
+        return (self.endPos - self.startPos).length()
 
     def rotate(self, degree: float):
         self.vector = self.vector.rotate(degree)
         self.rotation = (self.rotation + degree) % 360
 
-    def translateDirection(self):
+    @staticmethod
+    def directionToText(direction: Vector2D):
         """
         give back a string that represents the direction the element points in. Empty string if the element has no direction.
         This may happen if the scaling (length) is 0.
         returns: 'up', 'down', 'left', 'right', ''
         """
-        direction = self.direction()
         if direction.y == 0 and not direction.x == 0:
-            if direction.x > 0:
+            if direction.x >= 0:
                 return 'right'
             else: # direction.x < 0 :
                 return 'left'
@@ -67,6 +68,9 @@ class Element:
                 return 'down'
         else:
             return ''
+
+    def translateDirection(self):
+        return self.directionToText(self.direction())
 
     def netLine(self, node1:str, node2:str):
         return f"{self.name} {node1} {node2}; down\n"
@@ -158,6 +162,7 @@ class Element:
     def schemdrawElement(self):
         pass
 
-    @abstractmethod
-    def netlistLine(self):
-        pass
+    def netlistLine(self, nodeMap: dict[Vector2D, int], idGen: 'IDGenerator') -> str:
+        node1 = nodeMap[self.startPos]
+        node2 = nodeMap[self.endPos]
+        return f"{self.name} {node1} {node2} {{{self.name}}}; {self.translateDirection()}\n"

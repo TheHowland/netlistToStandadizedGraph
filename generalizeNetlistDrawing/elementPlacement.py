@@ -18,8 +18,6 @@ class ElementPlacement:
         self.elementPositions = self.netGraph.elementPositions
         self.linePositions = LinePlacement(self.netGraph, self.elementPositions).getLinePositions()
 
-        print("Finished Rastarisation2 init")
-
     @property
     def elements(self) -> Iterable[Element]:
         return chain(self.elementPositions.values(), self.linePositions)

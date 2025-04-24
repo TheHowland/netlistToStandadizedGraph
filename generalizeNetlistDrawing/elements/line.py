@@ -1,6 +1,7 @@
 import schemdrawInskale.elements as elm
 
 from generalizeNetlistDrawing.elements.element import Element
+from generalizeNetlistDrawing.idGenerator import IDGenerator
 from generalizeNetlistDrawing.vector2D import Vector2D
 
 
@@ -16,7 +17,7 @@ class Line(Element):
         pass
 
     def rotate(self, degree: float):
-        newDirection = (self.direction().angle() - 90 + degree) % 360
+        newDirection = (self.direction().angle() + 90 + degree) % 360
 
         self.rotation = newDirection
         self.vector = self.vector.rotate(degree)
@@ -24,5 +25,23 @@ class Line(Element):
     def schemdrawElement(self) -> elm.Line:
         return elm.Line().label(self.name).at(self.startPos.asTuple).to(self.endPos.asTuple)
 
-    def netlistLine(self):
-        raise NotImplemented("Netlist line not implemented for Line class")
+    def netlistLine(self, nodeMap: dict[Vector2D, int], idGen: 'IDGenerator') -> str:
+        # if line isn't a multiple of 1 it cant be represented in the lcapy netlist
+        node1 = nodeMap[self.startPos]
+        node2 = nodeMap[self.endPos]
+        
+        if self.length % 1:
+            raise RuntimeError("Line length is not a multiple of 1, cannot be represented in the lcapy netlist")
+        lines = ""
+        direction = self.translateDirection()
+        if self.length == 1:
+            return f"W {node1} {node2}; {direction}\n"
+        else:
+            lastID = idGen.newId
+            lines += f"W {node1} {lastID}; {direction}\n"
+            for i in range(1, int(self.length)-1):
+                newID = idGen.newId
+                lines += f"W {lastID} {newID}; {direction}\n"
+                lastID = newID
+            lines += f"W {lastID} {node2}; {direction}\n"
+            return lines
