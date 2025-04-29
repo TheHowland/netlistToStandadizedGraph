@@ -23,6 +23,8 @@ class Element:
         :param size: size of the element, equals the length of an element if it isn't a combination of multiple elements
         :param rotation: rotation of the element in degrees, 0 is oriented downward from (0,0) to (0,-1), rotation counterclockwise
         """
+        self._netLine = None
+
         if netLine:
             self.name = netLine[:netLine.find(" ")]
             self._netLine = netLine
@@ -77,9 +79,6 @@ class Element:
 
     def translateDirection(self):
         return self.directionToText(self.direction())
-
-    def netLine(self, node1:str, node2:str):
-        return f"{self.name} {node1} {node2}; down\n"
 
     def moveXY(self, delta: 'Element'):
         deltaX, deltaY = delta.startPos.asTuple
