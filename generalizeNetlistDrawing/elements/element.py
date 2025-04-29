@@ -25,7 +25,7 @@ class Element:
         """
         if netLine:
             self.name = netLine[:netLine.find(" ")]
-            self.netLine = netLine
+            self._netLine = netLine
 
         if name:
             self.name = name
