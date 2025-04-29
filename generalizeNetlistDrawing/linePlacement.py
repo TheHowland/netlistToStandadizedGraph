@@ -1,8 +1,7 @@
 from generalizeNetlistDrawing.elements.element import Element
 from generalizeNetlistDrawing.elements.line import Line
-
+from generalizeNetlistDrawing.netlistGraph import NetlistGraph
 from generalizeNetlistDrawing.vector2D import Vector2D
-from netlistGraph import NetlistGraph
 
 
 class LinePlacement:

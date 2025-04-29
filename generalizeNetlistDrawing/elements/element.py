@@ -160,7 +160,7 @@ class Element:
 
     @abstractmethod
     def schemdrawElement(self):
-        pass
+        raise NotImplementedError("schemdrawElement not implemented in base class, abstract method")
 
     def netlistLine(self, nodeMap: dict[Vector2D, int], idGen: 'IDGenerator') -> str:
         node1 = nodeMap[self.startPos]

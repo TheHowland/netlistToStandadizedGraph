@@ -10,8 +10,8 @@ from generalizeNetlistDrawing.linePlacement import LinePlacement
 
 
 class ElementPlacement:
-    def __init__(self, fileName):
-        cct = Circuit(fileName)
+    def __init__(self, fileContent: str):
+        cct = Circuit(fileContent)
         self.transformer = CircuitToGraph(cct, nx.MultiDiGraph)
         self.netGraph = self.transformer.NetlistGraph
         self.netGraph.place()

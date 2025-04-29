@@ -17,7 +17,7 @@ class ExportAsLcapyNetlist:
                 uniquePoints.add(elm.endPos)
                 nodeMap[elm.endPos] = self.idGen.newId
 
-            netlist += elm.netlistLine(nodeMap[elm.startPos], nodeMap[elm.endPos], self.idGen)
+            netlist += elm.netlistLine(nodeMap, self.idGen)
 
         self.netlist = netlist
 
