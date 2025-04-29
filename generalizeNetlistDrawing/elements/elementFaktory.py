@@ -15,15 +15,15 @@ class ElementFaktory:
         "I": sourceI.SourceI,
     }
 
-    def make(self, x=0.0, y=0.0, name="", size: Vector2D = None, rotation=0, scaling=1.0, default: Element=Element) -> Element:
+    def makeFromNetline(self, x=0.0, y=0.0, netLine: str = "", size: Vector2D = None, rotation=0, scaling=1.0, default: Element=Element) -> Element:
         """Determines the element type from the first letter of the name R1 -> R type"""
-        return self.makeFromType(x,y,name,size,rotation,scaling,name[0], default)
+        return self.makeFromType(x,y,netLine,size,rotation,scaling,netLine[0], default)
 
-    def makeFromType(self, x=0.0, y=0.0, name="", size: Vector2D = None, rotation=0, scaling=1.0,
+    def makeFromType(self, x=0.0, y=0.0, netLine="", size: Vector2D = None, rotation=0, scaling=1.0,
                  elmType:str = None, default: Element=Element) -> Element:
-
+        
         element_class = self.type_map.get(elmType, default)
         if element_class:
-            return element_class(x, y, name=name, size=size, rotation=rotation, scaling=scaling)
+            return element_class(x, y, netLine=netLine, size=size, rotation=rotation, scaling=scaling)
         else:
             raise NotImplementedError(f"Element type '{elmType}' is not implemented.")

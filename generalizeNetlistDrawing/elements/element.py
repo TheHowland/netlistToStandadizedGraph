@@ -13,17 +13,23 @@ class Direction(Enum):
 
 
 class Element:
-    def __init__(self, x=0.0, y=0.0, name="", vec: Vector2D = None, size: Vector2D = None, rotation=0, scaling=1.0,
+    def __init__(self, x=0.0, y=0.0,name: str = "", netLine="", vec: Vector2D = None, size: Vector2D = None, rotation=0, scaling=1.0,
                  elmType:str = None):
         """
         :param x: x coordinate of the element
         :param y: y coordinate of the element
         :param vec: Vector2D object representing x and y
-        :param name: name of the element
+        :param netLine: netlist line of the cpt
         :param size: size of the element, equals the length of an element if it isn't a combination of multiple elements
         :param rotation: rotation of the element in degrees, 0 is oriented downward from (0,0) to (0,-1), rotation counterclockwise
         """
-        self.name = name
+        if netLine:
+            self.name = netLine[:netLine.find(" ")]
+            self.netLine = netLine
+
+        if name:
+            self.name = name
+
         self._scale = scaling
         self.rotation = rotation
         self.elmType = elmType

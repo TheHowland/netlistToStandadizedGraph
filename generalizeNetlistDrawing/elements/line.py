@@ -6,14 +6,14 @@ from generalizeNetlistDrawing.vector2D import Vector2D
 
 
 class Line(Element):
-    def __init__(self, vec1: Vector2D, vec2: Vector2D, name=""):
+    def __init__(self, vec1: Vector2D, vec2: Vector2D, netLine=""):
         direction = (vec1 - vec2).normalize()
         length = (vec2 - vec1).length()
 
         angleDeg = direction.angle()
         rotation = angleDeg - 90.0
 
-        super().__init__(vec1.x, vec1.y, rotation=rotation, scaling=length)
+        super().__init__(vec1.x, vec1.y, netLine=netLine, rotation=rotation, scaling=length)
         pass
 
     def rotate(self, degree: float):
@@ -23,7 +23,7 @@ class Line(Element):
         self.vector = self.vector.rotate(degree)
 
     def schemdrawElement(self) -> elm.Line:
-        return elm.Line().label(self.name).at(self.startPos.asTuple).to(self.endPos.asTuple)
+        return elm.Line().at(self.startPos.asTuple).to(self.endPos.asTuple)
 
     def netlistLine(self, nodeMap: dict[Vector2D, int], idGen: 'IDGenerator') -> str:
         # if line isn't a multiple of 1 it cant be represented in the lcapy netlist

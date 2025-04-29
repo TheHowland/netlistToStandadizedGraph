@@ -15,7 +15,7 @@ class CircuitToGraph:
         self.endNode: int
         self.cleandUpNetlist: list[NetlistLine] = self._cleanUpNetlist()
         self.graphType = graphType
-        self.factory = ElementFaktory().make
+        self.factory = ElementFaktory().makeFromNetline
 
     def _cleanUpNetlist(self) -> list[NetlistLine]:
         """
@@ -53,7 +53,8 @@ class CircuitToGraph:
         graph = self.graphType()
         for line in self.cleandUpNetlist:
             name = line.label
-            graph.add_edge(line.startNode, line.endNode, key=name, data=self.factory(name=name))
+            netLine = str(line)
+            graph.add_edge(line.startNode, line.endNode, key=name, data=self.factory(netLine=netLine))
         return graph
 
     @property
