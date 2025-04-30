@@ -43,8 +43,8 @@ class Positions:
         for elm in iter(self.placedElems.elements):
             x1, y1 = elm.startPos.asTuple
             x2, y2 = elm.endPos.asTuple
-            maxX = max(x1, x2)
-            maxY = max(y1, y2)
+            maxX = max(abs(x1), abs(x2))
+            maxY = max(abs(y1), abs(y2))
             if maxX > globMaxX:
                 globMaxX = maxX
             if maxY > globMaxY:
