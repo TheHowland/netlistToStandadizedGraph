@@ -1,11 +1,13 @@
 from setuptools import find_packages, setup
 
+from generalizeNetlistDrawing.__version__ import __version__
+
 setup(
     name="generalizeNetlistDrawing",
-    version="0.7",
+    version=__version__,
     packages=find_packages(),
     install_requires=[
-        "lcapy",
-        "networkx",
+        "lcapyInskale",
+        "schemdrawInskale",
     ],
 )
