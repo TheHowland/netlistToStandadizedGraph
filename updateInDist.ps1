@@ -1,5 +1,6 @@
 param (
-[string]$destination
+[string]$destination,
+[string]$pythonPath
 )
 # Check if it ends with backslash
 if (-not ($destination.EndsWith('\'))) {
@@ -44,8 +45,12 @@ catch {
     Set-Location $startDir
     return
 }
-Write-Output ([string]::Concat("Copied ", $newPackage, " to: ", $destination))
+Write-Output "Copied $newPackage to: $destination"
 
 
 Write-Host "Successfully updated generalizeNetlistDrawing package in Pyodide distribution" -ForegroundColor Green
+& ([string]::Concat($pythonPath, "Scripts\Activate.ps1"))
+& ([string]::Concat($pythonPath, "Scripts\pip.exe")) install ([string]::Concat("dist\", $newPackage))
+
 Set-Location $startDir
+Write-Host "Successfully installed $newPackage in virtual venv" -ForegroundColor Green
