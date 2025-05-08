@@ -60,10 +60,26 @@ class NetlistGraph:
             edge = [n1, n2, key]
         return graph[edge[0]][edge[1]][edge[2]]['data']
 
+    def _getEdgesToPlace(self):
+        if self.subGraphRelation == rel.Row:
+            edgesToPlace = []
+            node = self.graphStart
+            while True:
+                edgeList = list(self.subGraph.out_edges(node, keys=True))
+                if edgeList:
+                    edge = edgeList[0]
+                    edgesToPlace.append(edge)
+                    node = edge[1]
+                else:
+                    return edgesToPlace
+        else:
+            return list(self.subGraph.edges(keys=True))
+
+
     def _placeSubgraphElements(self):
         edge = [edge for edge in self.graph.edges(keys=True) if edge[2] == self.subGraphName][0]
         offset: Vector2D = self._getEdgeData(self.graph, edge).startPos
-        edgesToPlace = list(self.subGraph.edges(keys=True))
+        edgesToPlace = self._getEdgesToPlace()
         relation = self.subGraphRelation
 
         if edgesToPlace:

@@ -1,3 +1,5 @@
+from typing import Any
+
 from generalizeNetlistDrawing.elements.element import Element
 from generalizeNetlistDrawing.elements.line import Line
 from generalizeNetlistDrawing.netlistGraph import NetlistGraph
@@ -9,12 +11,59 @@ class LinePlacement:
         self.netGraph = netGraph
         self.elementPositions = elementPositions
         self.linePositions: list[Line] = []
+        nodePos = self._findDeepestNodeValue()
         self.nodeDepth: dict[str, float] = {}
-        self.findVerticalLines()
-        self.findHorizontalLines()
+        self.leg_findVerticalLines()
+        self.leg_findHorizontalLines()
         pass
 
-    def findVerticalLines(self):
+    def _findDeepestNodeValue(self) -> dict[Any, float]:
+        nodePos = {}
+        for node in iter(self.netGraph.graph.nodes):
+            nodePos[node] = []
+
+            edges = [edge for edge in self.netGraph.graph.edges(data=True) if edge[0] == node or edge[1] == node]
+
+            yValues = []
+            for edge in edges:
+                if edge[0] == node:
+                    yValues.append(edge[2]['data'].startPos.y)
+                else:
+                    yValues.append(edge[2]['data'].startPos.y)
+
+            nodePos[node] = min(yValues)
+
+        return nodePos
+
+    def findVerticalLines(self, nodePos: dict[Any, list[Vector2D]]):
+
+        for node in nodePos.keys():
+            # elements are drawn down so the smallest y is the y farthest away from the start point 0/0.
+            # and each element connected to this node that has a y that is different from the smallest y
+            # needs a line from y smallest to the y coordinate of the element
+            ySmallest = min([vec.y for vec in nodePos[node]])
+            for pos in nodePos[node]:
+                if pos.y != ySmallest:
+                    self.linePositions.append(Line(
+                        Vector2D(pos.x, ySmallest),
+                        Vector2D(pos.x, pos.y)
+                    ))
+                    # reassign new y coordinate to simplify the search for horizontal lines
+                    # horizontal lines are placed between the node positions
+                    pos.y = ySmallest
+
+    def findHorizontalLines(self, nodePos: dict[Any, list[Vector2D]]):
+        for node in nodePos.keys():
+            positions = nodePos[node]
+            if len(positions) > 1:
+                positions.sort(key=lambda p: p.x)
+                for i in range(0, len(positions)-1):
+                    self.linePositions.append(Line(
+                        Vector2D(positions[i].x, positions[i].y),
+                        Vector2D(positions[i+1].x, positions[i].y)
+                    ))
+
+    def leg_findVerticalLines(self):
         for node in iter(self.netGraph.graph.nodes):
             inEdges = self.netGraph.graph.in_edges(node, keys=True)
             if len(inEdges) >= 2:
@@ -39,7 +88,7 @@ class LinePlacement:
                     if elmEndPos.y > yBiggest:
                         self.linePositions.append(Line(elmEndPos, Vector2D(elmEndPos.x, yBiggest)))
 
-    def findHorizontalLines(self):
+    def leg_findHorizontalLines(self):
         for node in iter(self.netGraph.graph.nodes):
             if self.netGraph.graph.in_degree(node) >= 2:
                 edges = self.netGraph.graph.in_edges(node, keys=True)
