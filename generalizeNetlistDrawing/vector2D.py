@@ -3,8 +3,16 @@ from math import atan2, cos, pi, sin, sqrt
 
 class Vector2D:
     def __init__(self, x=0.0, y=0.0):
-        self.x = x
-        self.y = y
+        self._x = x
+        self._y = y
+
+    @property
+    def x(self):
+        return float(self._x)
+
+    @property
+    def y(self):
+        return float(self._y)
 
     def __str__(self):
         return f"(x:{self.x} y: {self.y})"
@@ -16,8 +24,8 @@ class Vector2D:
         return self.__add__(other.scale(-1))
 
     def __iadd__(self, other: 'Vector2D'):
-        self.x = self.x + other.x
-        self.y = self.y + other.y
+        self._x = self.x + other.x
+        self._y = self.y + other.y
         return self
 
     def __isub__(self, other: 'Vector2D'):
@@ -36,8 +44,8 @@ class Vector2D:
         return self.__mul__(Vector2D(factor, factor))
 
     def scaleSelf(self, factor: float):
-        self.x *= factor
-        self.y *= factor
+        self._x *= factor
+        self._y *= factor
         return self
 
     def __abs__(self):
@@ -52,8 +60,8 @@ class Vector2D:
 
     def normalizeSelf(self):
         vec = self.normalize()
-        self.x = vec.x
-        self.y = vec.y
+        self._x = vec.x
+        self._y = vec.y
         return self
 
     def rotate(self, angleDeg=None, angleRad=None):
