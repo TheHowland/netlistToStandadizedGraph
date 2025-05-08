@@ -88,10 +88,10 @@ class Element:
         self.moveY(deltaY)
 
     def moveX(self, deltaX):
-        self.vector.x += deltaX
+        self.vector += Vector2D(deltaX, 0)
 
     def moveY(self, deltaY):
-        self.vector.y += deltaY
+        self.vector += Vector2D(0, deltaY)
 
     @property
     def startPos(self) -> Vector2D:
