@@ -130,8 +130,7 @@ class Element:
 
     def scaleSelf(self, factor: float):
         self._scale *= factor
-        self.vector.x *= factor
-        self.vector.y *= factor
+        self.scaleSelf(factor)
         return self
 
     def __abs__(self):
