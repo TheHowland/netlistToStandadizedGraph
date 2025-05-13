@@ -35,13 +35,13 @@ class CircuitToGraph:
             if line.type == "W":
                 continue
 
-            line.startNode = int(eqNodeMap[str(line.startNode)])
-            line.endNode = int(eqNodeMap[str(line.endNode)])
+            line.posNode = int(eqNodeMap[str(line.posNode)])
+            line.negNode = int(eqNodeMap[str(line.negNode)])
             cleandUpNetlist.append(line)
 
             if line.type == "V" or line.type == "I":
-                self.startNode = line.startNode
-                self.endNode = line.endNode
+                self.startNode = line.posNode
+                self.endNode = line.negNode
                 self.ac_dc = line.ac_dc
                 self.value = line.value
                 continue
@@ -54,7 +54,7 @@ class CircuitToGraph:
         for line in self.cleandUpNetlist:
             name = line.label
             netLine = str(line)
-            graph.add_edge(line.startNode, line.endNode, key=name, data=self.factory(name=name, netLine=netLine))
+            graph.add_edge(line.posNode, line.negNode, key=name, data=self.factory(name=name, netLine=netLine))
         return graph
 
     @property
