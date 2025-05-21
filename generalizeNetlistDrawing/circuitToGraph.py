@@ -36,7 +36,7 @@ class CircuitToGraph:
         cleandUpNetlist = []
 
         for line in netLines:
-            if line.type == "W":
+            if line.type in ["W", "#"]:
                 continue
 
             line.posNode = self.eqNodeMap[line.posNode]
