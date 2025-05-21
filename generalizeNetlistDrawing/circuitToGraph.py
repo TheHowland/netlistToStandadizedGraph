@@ -2,20 +2,30 @@ from typing import Type
 
 import networkx as nx
 from lcapyInskale import Circuit
-from simplipfy.netlistLine import NetlistLine
+from simplipfy.helpers.netlistLine import NetlistLine
 
 from generalizeNetlistDrawing.elements.elementFaktory import ElementFaktory
 from generalizeNetlistDrawing.netlistGraph import NetlistGraph
 
 
 class CircuitToGraph:
-    def __init__(self, lcapyCircuit: Circuit, graphType: Type[nx.Graph]):
+    def __init__(self, lcapyCircuit: Circuit, graphType: Type[nx.Graph], eqNodeMap: dict[str, str] = None):
         self.cct = lcapyCircuit
         self.startNode: int
         self.endNode: int
+        self.eqNodeMap: dict[str, str] = self.makeEqNodeMap() if eqNodeMap is None else eqNodeMap
         self.cleandUpNetlist: list[NetlistLine] = self._cleanUpNetlist()
         self.graphType = graphType
         self.factory = ElementFaktory().make
+
+    def makeEqNodeMap(self):
+        eqNodeMap = {}
+        eqNodes = self.cct.equipotential_nodes
+        for masterNode in eqNodes.keys():
+            for node in eqNodes[masterNode]:
+                eqNodeMap[node] = masterNode
+
+        return eqNodeMap
 
     def _cleanUpNetlist(self) -> list[NetlistLine]:
         """
@@ -25,18 +35,12 @@ class CircuitToGraph:
         netLines = [NetlistLine(line) for line in self.cct.netlist().splitlines()]
         cleandUpNetlist = []
 
-        eqNodeMap = {}
-        eqNodes = self.cct.equipotential_nodes
-        for masterNode in eqNodes.keys():
-            for node in eqNodes[masterNode]:
-                eqNodeMap[node] = masterNode
-
         for line in netLines:
             if line.type == "W":
                 continue
 
-            line.posNode = int(eqNodeMap[str(line.posNode)])
-            line.negNode = int(eqNodeMap[str(line.negNode)])
+            line.posNode = self.eqNodeMap[line.posNode]
+            line.negNode = self.eqNodeMap[line.negNode]
             cleandUpNetlist.append(line)
 
             if line.type == "V" or line.type == "I":
