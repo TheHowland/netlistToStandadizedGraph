@@ -30,7 +30,7 @@ class CircuitToGraph:
     def _cleanUpNetlist(self) -> list[NetlistLine]:
         """
         Converts the netlist into an easy-to-use format and removes lines from netlist
-        :returns list of NetlistLines
+        :returns a list of NetlistLines
         """
         netLines = [NetlistLine(line) for line in self.cct.netlist().splitlines()]
         cleandUpNetlist = []
