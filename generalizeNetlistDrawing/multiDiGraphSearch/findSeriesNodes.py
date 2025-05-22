@@ -41,8 +41,13 @@ def successorPredecessorOfNodeInSet(graph, node, nodeSet):
     return seriesNodeSequences
 
 
-def findSuccessorAndPredecessorOfNodeSequence(graph, sequence) -> list:
-    nodeAB = []
+
+def findSuccessorAndPredecessorOfNodeSequence(graph, sequence) -> tuple[any, any]:
+    """
+    :returns: (predecessor, successor) of the node sequence
+    """
+    predecessor = None
+    successor = None
     for elm in sequence:
         pre = list(graph.predecessors(elm))
         pre = pre[0] if pre else None
@@ -50,11 +55,13 @@ def findSuccessorAndPredecessorOfNodeSequence(graph, sequence) -> list:
         suc = suc[0] if suc else None
 
         if pre not in sequence and pre is not None:
-            nodeAB.append(pre)
+            predecessor = pre
         if suc not in sequence and suc is not None:
-            nodeAB.append(suc)
+            successor = suc
 
-    return nodeAB
+    assert predecessor is not None and successor is not None, "predecessor and successor of node sequence are None"
+
+    return predecessor, successor
 
 
 class FindSeriesNodes(FindSeriesNodesInterface):
@@ -67,7 +74,10 @@ class FindSeriesNodes(FindSeriesNodesInterface):
         returns a sequence of nodes that are in a series
         """
         seriesNodes = findPossibleRowNodes(graph)
-        if not seriesNodes:
+        if not seriesNodes or len(graph.nodes) <= 2:
+            # if there are no series nodes or the graph has only two nodes, return an empty list
+            # with only two nodes in the graph findSuccessorAndPredecessorOfNodeSequence will crash the
+            # program after returning an empty list
             return []
 
         seriesNodeSequence = makeRowNodeSequences(graph, seriesNodes)

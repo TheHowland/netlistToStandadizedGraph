@@ -55,7 +55,15 @@ class Vector2D:
         return sqrt(self.x**2 + self.y**2)
 
     def normalize(self) -> 'Vector2D':
+        """
+        :returns: normalized vector, if vecLen = 0 returns Vector2D(0,0)
+        """
         vecLen = self.length()
+        if vecLen == 0:
+            # there can be a vector 0,0 (origin) which causes a division by 0
+            # this vector has no normalized form but to prevent division by zero and assert consistency
+            # Vector2D(0,0) is returned
+            return Vector2D(0, 0)
         return Vector2D(self.x/vecLen, self.y/vecLen)
 
     def normalizeSelf(self):
