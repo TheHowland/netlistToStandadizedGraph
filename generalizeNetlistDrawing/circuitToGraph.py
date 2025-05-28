@@ -2,7 +2,7 @@ from typing import Type
 
 import networkx as nx
 from lcapyInskale import Circuit
-from simplipfy.helpers.netlistLine import NetlistLine
+from simplipfy.Helpers.netlistLine import NetlistLine
 
 from generalizeNetlistDrawing.elements.elementFaktory import ElementFaktory
 from generalizeNetlistDrawing.netlistGraph import NetlistGraph
