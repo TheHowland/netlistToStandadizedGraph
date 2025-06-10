@@ -202,7 +202,11 @@ class NetlistGraph:
         draw_networkx_labels(self.graph, pos)
 
         # Add edge labels with keys
-        edge_labels = {(u, v): k for u, v, k in self.graph.edges(keys=True)}
+        if isinstance(self, MultiGraph):
+            edge_labels = {(u, v, k): k for u, v, k in self.edges(keys=True)}
+        else:
+            edge_labels = {(u, v): k['key'] for u, v, k in self.edges(data=True)}
+
         draw_networkx_edge_labels(self.graph, pos, edge_labels=edge_labels)
 
         plt.show()
