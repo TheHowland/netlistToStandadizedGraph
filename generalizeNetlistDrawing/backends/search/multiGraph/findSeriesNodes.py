@@ -9,7 +9,7 @@ def findPossibleSeriesNodes(graph: MultiGraph) -> list:
     """
     seriesNodes = []
     for node in graph.nodes:
-        if graph.degree[node] == 2:
+        if graph.degree[node] == 2 and len(list(graph.neighbors(node))) == 2:
             seriesNodes.append(node)
 
     return seriesNodes
@@ -22,7 +22,7 @@ def findSeriesChainRecursive(graph: MultiGraph, node, foundNodes: set):
         if not neighbors[0] in foundNodes:
             foundNodes.add(neighbors[0])
             return [neighbors[0]] + findSeriesChainRecursive(graph, neighbors[0], foundNodes)
-        if not neighbors[1] in foundNodes:
+        if len(neighbors) >= 2 and not neighbors[1] in foundNodes:
             foundNodes.add(neighbors[1])
             return [neighbors[1]] + findSeriesChainRecursive(graph, neighbors[1], foundNodes)
         return []

@@ -4,12 +4,13 @@ import networkx as nx
 from lcapyInskale import Circuit
 from simplipfy.Helpers.netlistLine import NetlistLine
 
+from generalizeNetlistDrawing import NxMultiGraph
 from generalizeNetlistDrawing.elements.elementFaktory import ElementFaktory
 from generalizeNetlistDrawing.netlistGraph import NetlistGraph
 
 
 class CircuitToGraph:
-    def __init__(self, lcapyCircuit: Circuit, graphType: Type[nx.Graph], eqNodeMap: dict[str, str] = None):
+    def __init__(self, lcapyCircuit: Circuit, graphType: Type[NxMultiGraph], eqNodeMap: dict[str, str] = None):
         self.cct = lcapyCircuit
         self.startNode: int
         self.endNode: int

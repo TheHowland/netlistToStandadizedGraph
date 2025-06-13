@@ -1,27 +1,29 @@
-from typing import Union
+from typing import TYPE_CHECKING, Union
 from warnings import warn
 
 from networkx import MultiGraph, draw_networkx_edge_labels, draw_networkx_edges, draw_networkx_labels, \
     draw_networkx_nodes, spring_layout
 
-from generalizeNetlistDrawing.backends.search.multiDiGraph import findParallelNode, findRowNodesSequence
-from generalizeNetlistDrawing.backends.search.multiDiGraph.functionsOnGraph import edgesBetweenNodes
+from generalizeNetlistDrawing import edgesBetweenNodes, findParallelNode, findRowNodesSequence, getEdgesOfSubGraph
 from generalizeNetlistDrawing.elements.element import Element
 from generalizeNetlistDrawing.elements.elementRelation import ElementRelation as rel
 from generalizeNetlistDrawing.idGenerator import IDGenerator
 from generalizeNetlistDrawing.vector2D import Vector2D
 
+if TYPE_CHECKING:
+    from generalizeNetlistDrawing import NxMultiGraph
+
 
 class NetlistGraph:
     idGenerator = IDGenerator()
 
-    def __init__(self, graph: MultiGraph, startNode, endNode, subGraph: Union[None, MultiGraph] = None, subGraphName: str = None, relation: rel = rel.NONE):
+    def __init__(self, graph: 'NxMultiGraph', startNode, endNode, subGraph: Union[None, 'NxMultiGraph'] = None, subGraphName: str = None, relation: rel = rel.NONE):
         # ToDo remove start and end node
         self.graphStart: int = startNode
         self.graphEnd: int = endNode
 
-        self.graph: MultiGraph = graph
-        self.subGraph: MultiGraph = subGraph
+        self.graph: NxMultiGraph = graph
+        self.subGraph: NxMultiGraph = subGraph
         self.subGraphRelation: rel = relation
         self.subGraphName: Union[None, str] = subGraphName
         self._actualSize = None
@@ -46,6 +48,7 @@ class NetlistGraph:
         if not nextGraph:
             nextGraph = self.findParallelSubGraph()
 
+        self.draw_graph()
         if nextGraph:
             nextGraph.place()
 
@@ -60,27 +63,12 @@ class NetlistGraph:
             edge = [n1, n2, key]
         return graph[edge[0]][edge[1]][edge[2]]['data']
 
-    def _getEdgesToPlace(self):
-        if self.subGraphRelation == rel.Row:
-            edgesToPlace = []
-            node = self.graphStart
-            while True:
-                edgeList = list(self.subGraph.out_edges(node, keys=True))
-                if edgeList:
-                    edge = edgeList[0]
-                    edgesToPlace.append(edge)
-                    node = edge[1]
-                else:
-                    return edgesToPlace
-        else:
-            return list(self.subGraph.edges(keys=True))
-
-
     def _placeSubgraphElements(self):
         edge = [edge for edge in self.graph.edges(keys=True) if edge[2] == self.subGraphName][0]
         offset: Vector2D = self._getEdgeData(self.graph, edge).startPos
-        edgesToPlace = self._getEdgesToPlace()
         relation = self.subGraphRelation
+        edgesToPlace = getEdgesOfSubGraph(self.subGraph, relation, self.graphStart)
+
 
         if edgesToPlace:
             curElm: Element = self._getEdgeData(self.subGraph, edgesToPlace[0])
@@ -202,10 +190,10 @@ class NetlistGraph:
         draw_networkx_labels(self.graph, pos)
 
         # Add edge labels with keys
-        if isinstance(self, MultiGraph):
-            edge_labels = {(u, v, k): k for u, v, k in self.edges(keys=True)}
+        if isinstance(self.graph, MultiGraph):
+            edge_labels = {(u, v, k): k for u, v, k in self.graph.edges(keys=True)}
         else:
-            edge_labels = {(u, v): k['key'] for u, v, k in self.edges(data=True)}
+            edge_labels = {(u, v): k['key'] for u, v, k in self.graph.edges(data=True)}
 
         draw_networkx_edge_labels(self.graph, pos, edge_labels=edge_labels)
 
@@ -213,7 +201,10 @@ class NetlistGraph:
         print("-------------------------")
         print(self.subGraphName)
         print("Graph edges:" + str(self.graph.edges))
-        print("Sub graph edges:" + str(self.subGraph.edges))
+        if self.subGraph is not None:
+            print("Sub graph edges:" + str(self.subGraph.edges))
+        else:
+            print("Sub graph edges: None")
 
     @property
     def elementPositions(self) -> dict:

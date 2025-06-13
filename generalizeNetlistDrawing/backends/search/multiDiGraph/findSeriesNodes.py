@@ -75,9 +75,9 @@ class FindSeriesNodes(FindSeriesNodesInterface):
         """
         seriesNodes = findPossibleRowNodes(graph)
         if not seriesNodes or len(graph.nodes) <= 2:
-            # if there are no series nodes or the graph has only two nodes, return an empty list
+            # If there are no series nodes or the graph has only two nodes, return an empty list
             # with only two nodes in the graph findSuccessorAndPredecessorOfNodeSequence will crash the
-            # program after returning an empty list
+            # program. With only two nodes in the graph, there can't be a series node. Returning an empty list
             return []
 
         seriesNodeSequence = makeRowNodeSequences(graph, seriesNodes)
