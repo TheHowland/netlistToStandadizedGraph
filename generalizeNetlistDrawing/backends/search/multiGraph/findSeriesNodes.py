@@ -58,6 +58,6 @@ class FindSeriesNodes(FindSeriesNodesInterface):
     @staticmethod
     def findSeriesNodesSequence(graph: MultiGraph) -> list:
         """
-        returns a sequences of nodes that are in a series
+        returns a sequences of nodes that are in series
         """
         return findSeriesNodeChain(graph)
