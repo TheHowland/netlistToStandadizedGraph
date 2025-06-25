@@ -48,7 +48,7 @@ class NetlistGraph:
         if not nextGraph:
             nextGraph = self.findParallelSubGraph()
 
-        self.draw_graph()
+        #self.draw_graph()
         if nextGraph:
             nextGraph.place()
 
