@@ -4,8 +4,8 @@ import networkx as nx
 from lcapyInskale import Circuit
 from simplipfy.Helpers.netlistLine import NetlistLine
 
-from generalizeNetlistDrawing import NxMultiGraph
 from generalizeNetlistDrawing.elements.elementFaktory import ElementFaktory
+from generalizeNetlistDrawing.graph_backend import NxMultiGraph
 from generalizeNetlistDrawing.netlistGraph import NetlistGraph
 
 

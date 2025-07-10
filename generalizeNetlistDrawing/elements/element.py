@@ -56,9 +56,9 @@ class Element:
     @staticmethod
     def directionToText(direction: Vector2D):
         """
-        give back a string that represents the direction the element points in. Empty string if the element has no direction.
-        This may happen if the scaling (length) is 0.
         returns: 'up', 'down', 'left', 'right', ''
+        Give back a string that represents the direction the element points in. Empty string if the element has no
+        direction. This may happen if the scaling (length) is 0.
         """
         if direction.y == 0 and not direction.x == 0:
             if direction.x >= 0:
@@ -126,6 +126,8 @@ class Element:
 
     def scale(self, factor: float) -> 'Element':
         self._scale = factor
+        # ToDo this should return the element type that it is itself not a generic element
+        # use element factory to return the correct type
         return Element(vec=self.vector.scale(factor))
 
     def scaleSelf(self, factor: float):

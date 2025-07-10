@@ -4,14 +4,15 @@ from warnings import warn
 from networkx import MultiGraph, draw_networkx_edge_labels, draw_networkx_edges, draw_networkx_labels, \
     draw_networkx_nodes, spring_layout
 
-from generalizeNetlistDrawing import edgesBetweenNodes, findParallelNode, findRowNodesSequence, getEdgesOfSubGraph
 from generalizeNetlistDrawing.elements.element import Element
 from generalizeNetlistDrawing.elements.elementRelation import ElementRelation as rel
+from generalizeNetlistDrawing.graph_backend import edgesBetweenNodes, findParallelNode, findRowNodesSequence, \
+    getEdgesOfSubGraph
 from generalizeNetlistDrawing.idGenerator import IDGenerator
 from generalizeNetlistDrawing.vector2D import Vector2D
 
 if TYPE_CHECKING:
-    from generalizeNetlistDrawing import NxMultiGraph
+    from generalizeNetlistDrawing.graph_backend import NxMultiGraph
 
 
 class NetlistGraph:
@@ -26,15 +27,11 @@ class NetlistGraph:
         self.subGraph: NxMultiGraph = subGraph
         self.subGraphRelation: rel = relation
         self.subGraphName: Union[None, str] = subGraphName
-        self._actualSize = None
-        self._elmPlacement = None
 
     def subGraphs(self) -> dict[any, 'NetlistGraph']:
         subGraphs = {}
 
-        nextGraph = self.findRowSubGraph()
-        if not nextGraph:
-            nextGraph = self.findParallelSubGraph()
+        nextGraph = self.createNextNetGraph()
 
         if nextGraph:
             subGraphs[nextGraph.subGraphName] = nextGraph
@@ -44,11 +41,9 @@ class NetlistGraph:
 
 
     def place(self) -> 'NetlistGraph':
-        nextGraph = self.findRowSubGraph()
-        if not nextGraph:
-            nextGraph = self.findParallelSubGraph()
+        nextGraph = self.createNextNetGraph()
 
-        self.draw_graph()
+        #self.draw_graph()
         if nextGraph:
             nextGraph.place()
 
@@ -56,6 +51,13 @@ class NetlistGraph:
             self._placeSubgraphElements()
 
         return self
+
+    def createNextNetGraph(self):
+        nextGraph = self.findRowSubGraph()
+        if nextGraph:
+            return nextGraph
+        else:
+            return self.findParallelSubGraph()
 
     @staticmethod
     def _getEdgeData(graph, edge: list=None, n1=None, n2=None, key=None):

@@ -6,8 +6,8 @@ from generalizeNetlistDrawing.vector2D import Vector2D
 
 class SourceV(Element):
     def schemdrawElement(self) -> elm.StabilizedSource:
-        direction = self.directionToText(self.direction()*Vector2D(-1, -1))
-        return elm.StabilizedSource(d=direction).label(self.name).at(self.endPos.asTuple).to(self.startPos.asTuple)
+        direction = self.directionToText(self.direction())
+        return elm.StabilizedSource(d=direction).label(self.name).at(self.startPos.asTuple).to(self.endPos.asTuple)
 
 
     def netlistLine(self, nodeMap: dict[Vector2D, int], idGen: 'IDGenerator'):

@@ -3,9 +3,9 @@ from typing import Iterable
 
 from lcapyInskale import Circuit
 
-from generalizeNetlistDrawing import GraphType
 from generalizeNetlistDrawing.circuitToGraph import CircuitToGraph
 from generalizeNetlistDrawing.elements.element import Element
+from generalizeNetlistDrawing.graph_backend import GraphType
 from generalizeNetlistDrawing.linePlacement import LinePlacement
 
 
