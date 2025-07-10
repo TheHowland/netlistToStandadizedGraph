@@ -11,4 +11,5 @@ setup(
         "schemdrawInskale",
         "networkx"
     ],
+    setup_requires=["build", "wheel", "setuptools"]
 )

@@ -12,6 +12,7 @@ class DrawWithSchemdraw(Positions):
             self.d.add(elmPos.schemdrawElement())
 
         self.d.draw()
+        self.d.save("drawing.svg")
 
 
 
