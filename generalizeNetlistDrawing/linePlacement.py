@@ -68,10 +68,11 @@ class LinePlacement:
                 # It would also work to draw a line from xSmallest to xBiggest. Drawing one line would make it much harder
                 # to detect where lines and elements meet if an element meets a line in the middle of the line
                 for i in range(0, len(positions)-1):
-                    self.linePositions.append(Line(
-                        Vector2D(positions[i].x, ySmallest),
-                        Vector2D(positions[i+1].x, ySmallest)
-                    ))
+                    if positions[i].x != positions[i+1].x:
+                        self.linePositions.append(Line(
+                            Vector2D(positions[i].x, ySmallest),
+                            Vector2D(positions[i+1].x, ySmallest)
+                        ))
 
     def getLinePositions(self):
         return self.linePositions
