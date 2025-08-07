@@ -11,9 +11,9 @@ class LinePlacement:
         self.netGraph = netGraph
         self.elementPositions = elementPositions
         self.linePositions: list[Line] = []
-        nodePos = self._findPositionsToNodes()
-        self._findVerticalLines(nodePos)
-        self._findHorizontalLines(nodePos)
+        self.nodePos = self._findPositionsToNodes()
+        self._findVerticalLines(self.nodePos)
+        self._findHorizontalLines(self.nodePos)
 
         #self.nodeDepth: dict[str, float] = {}
         #self.leg_findVerticalLines()

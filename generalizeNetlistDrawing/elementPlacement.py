@@ -16,7 +16,10 @@ class ElementPlacement:
         self.netGraph = self.transformer.NetlistGraph
         self.netGraph.place()
         self.elementPositions = self.netGraph.elementPositions
-        self.linePositions = LinePlacement(self.netGraph, self.elementPositions).getLinePositions()
+
+        lp = LinePlacement(self.netGraph, self.elementPositions)
+        self.linePositions = lp.getLinePositions()
+        self.nodePos = lp.nodePos
 
     @property
     def elements(self) -> Iterable[Element]:

@@ -33,11 +33,11 @@ class CircuitToGraph:
         Converts the netlist into an easy-to-use format and removes lines from netlist
         :returns a list of NetlistLines
         """
-        netLines = [NetlistLine(line) for line in self.cct.netlist().splitlines()]
+        netLines = [NetlistLine(line) for line in self.cct.netlist().splitlines() if line[0] != "#"]
         cleandUpNetlist = []
 
         for line in netLines:
-            if line.type in ["W", "#"]:
+            if line.type in ["W"]:
                 continue
 
             line.posNode = self.eqNodeMap[line.posNode]
