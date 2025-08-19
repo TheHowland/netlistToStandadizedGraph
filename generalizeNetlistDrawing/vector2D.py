@@ -86,6 +86,12 @@ class Vector2D:
         newY = round(self.x * sin(angleRad) + self.y * cos(angleRad), 10)
         return Vector2D(newX, newY)
 
+    def rotateSelf(self,angleDeg=None, angleRad=None):
+        vec = self.rotate(angleDeg, angleRad)
+        self._x = vec.x
+        self._y = vec.y
+        return self
+
     @property
     def asTuple(self) -> tuple:
         return self.x, self.y

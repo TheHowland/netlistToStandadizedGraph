@@ -1,7 +1,5 @@
 from enum import Enum
 
-import schemdrawInskale as sd
-
 from generalizeNetlistDrawing.elementPlacement import ElementPlacement
 
 
@@ -37,6 +35,10 @@ class Positions:
     def rotate(self, degree: float):
         for elm in iter(self.placedElems.elements):
             elm.rotate(degree)
+
+        for nodeOccList in iter(self.placedElems.nodePos.values()):
+            for dot in nodeOccList:
+                dot.rotateSelf(degree)
 
     def maxXMaxY(self):
         globMaxX, globMaxY = 0, 0
