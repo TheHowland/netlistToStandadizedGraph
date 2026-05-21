@@ -1,9 +1,10 @@
 from abc import abstractmethod
 from enum import Enum
+from xmlrpc.client import Boolean
 
 from generalizeNetlistDrawing.idGenerator import IDGenerator
 from generalizeNetlistDrawing.vector2D import Vector2D
-
+from simplipfy.Helpers.netlistLine import NetlistLine
 
 class Direction(Enum):
     down = 0
@@ -30,7 +31,8 @@ class Element:
 
         self._scale = scaling
         self.rotation = rotation
-        self.elmType = elmType
+
+        self.netLine = None if not bool(netLine) else NetlistLine(netLine)
 
         if not vec:
             self.vector = Vector2D(x,y)
@@ -43,7 +45,7 @@ class Element:
 
     @property
     def type(self):
-        return self.elmType
+        return self.netLine.type
 
     @property
     def length(self) -> float:
@@ -167,4 +169,4 @@ class Element:
     def netlistLine(self, nodeMap: dict[Vector2D, int], idGen: 'IDGenerator') -> str:
         node1 = nodeMap[self.startPos]
         node2 = nodeMap[self.endPos]
-        return f"{self.name} {node1} {node2} {{{self.name}}}; {self.translateDirection()}\n"
+        return f"{self.name} {node1} {node2} {{{self.netLine.value}}}; {self.translateDirection()}\n"
